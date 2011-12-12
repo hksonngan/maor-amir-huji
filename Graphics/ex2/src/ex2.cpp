@@ -52,6 +52,7 @@ ArcBall* arcBall;
 
 //Matrixes
 GLfloat oldTransforms[16];
+GLfloat sphereTransforms[16];
 GLfloat currentTransform[16];
 
 //Mesh objects
@@ -64,7 +65,7 @@ float objectRealLength;
 //state boolean variables
 bool drawType=false;
 bool normalTypeSmooth = false;
-
+bool stateModelMove = true;
 
 GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -107,8 +108,16 @@ void updateOldTransformsMatrix()
 	glPushMatrix();
 	glLoadIdentity();
 	glMultMatrixf(currentTransform);
-	glMultMatrixf(oldTransforms);
-	glGetFloatv(GL_MODELVIEW_MATRIX,oldTransforms);
+	if (stateModelMove)
+	{
+		glMultMatrixf(oldTransforms);
+		glGetFloatv(GL_MODELVIEW_MATRIX,oldTransforms);
+	}
+	else
+	{
+		glMultMatrixf(sphereTransforms);
+		glGetFloatv(GL_MODELVIEW_MATRIX,sphereTransforms);
+	}
 	glPopMatrix();
 
 }
@@ -197,6 +206,7 @@ int main(int argc, char * argv[])
 
 
 	initialMatrix(oldTransforms);
+	initialMatrix(sphereTransforms);
 	initialMatrix(currentTransform);
 
 
@@ -288,9 +298,10 @@ void initGL(void)
 \******************************************************************/
 void display(void)
 {
-	GLfloat temp = objDepth/(objDepth+objRadius);
+	//GLfloat temp = objDepth/(objDepth+objRadius);
 
-	GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
+	GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.15,0.0, 0.0 };
+	//GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 
@@ -316,7 +327,8 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity();
 	glTranslatef(0.0,0.0, (-1)*objDepth);
-	glMultMatrixf(currentTransform);
+	if (stateModelMove)
+		glMultMatrixf(currentTransform);
 	glMultMatrixf(oldTransforms);
 
 
@@ -349,24 +361,43 @@ void display(void)
 	//draw light source
 	glDisable(GL_LIGHTING);  //in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glColor3f(1.0,1.0,1.0);
-	glMatrixMode(GL_MODELVIEW) ;
-	glLoadIdentity() ;
-	glTranslatef(0.0,circle->getCircleRadius()*1.1,-temp);
-
-	if (drawType)
-		glutSolidSphere(0.05, 16,16);
-	else
-		glutWireSphere(0.05, 16,16);
-	//draws 2D ArcBall's circle
 
 	glMatrixMode(GL_MODELVIEW) ;
-	glLoadIdentity() ;
+		glLoadIdentity() ;
 
-	circle->drawCircle();
-	glEnable(GL_LIGHTING); //in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
+		circle->drawCircle();
 
 
-	// Make sure everything gets painted  //
+
+		float objDepth = 4.0;
+		float objRadius = 1.0;
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(fov, 1.0, objDepth - 2*objRadius, objDepth + 2*objRadius);
+
+
+		glMatrixMode(GL_MODELVIEW) ;
+		glLoadIdentity() ;
+		glTranslatef(0.0,circle->getCircleRadius()*1.15,-objDepth);
+		if (!stateModelMove)
+			glMultMatrixf(currentTransform);
+		glMultMatrixf(sphereTransforms);
+
+
+		// drawing a 3D light sphere
+		if (drawType)
+
+			glutSolidSphere(0.05, 16,16);
+		else
+			glutWireSphere(0.05, 16,16);
+
+
+
+		glEnable(GL_LIGHTING); //in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
+
+
+		// Make sure everything gets painted  //
 	glFlush() ;
 
 
@@ -428,6 +459,7 @@ void keyboard(unsigned char key, int x, int y)
 
 		initialMatrix(currentTransform);
 		initialMatrix(oldTransforms);
+		initialMatrix(sphereTransforms);
 		fov = INITIAL_FOV;
 		glutPostRedisplay();
 		break;
@@ -448,6 +480,16 @@ void keyboard(unsigned char key, int x, int y)
 		glutPostRedisplay();
 		break;
 	}
+
+
+	case 'A':
+	case 'a':
+	{
+		stateModelMove = !stateModelMove;
+		glutPostRedisplay();
+		break;
+	}
+
 
 	return;
 	}
