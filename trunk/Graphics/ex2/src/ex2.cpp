@@ -147,6 +147,7 @@ void computeObjectInitScale()
 *             everything else on the GLUT to handle.
 *
 \******************************************************************/
+// checking
 int main(int argc, char * argv[])
 {
   // check correct usage  //
