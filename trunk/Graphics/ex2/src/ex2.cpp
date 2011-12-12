@@ -132,7 +132,7 @@ void computeObjectInitScale()
 
 	objRadius = diff_up > diff_low ? diff_up : diff_low;
 	objDepth = DEPTH2RADIUS_RATIO*objRadius;
-
+	cout << "objDepth= " <<objDepth <<endl;
 }
 
 
@@ -287,7 +287,9 @@ void initGL(void)
 \******************************************************************/
 void display(void)
 {
-	GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-objDepth+2*objRadius, 0.0 };
+	GLfloat temp = objDepth/(objDepth+objRadius);
+
+	GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 
@@ -348,7 +350,7 @@ void display(void)
   glColor3f(1.0,1.0,1.0);
   glMatrixMode(GL_MODELVIEW) ;
   glLoadIdentity() ;
-  glTranslatef(0.0,circle->getCircleRadius()*1.1,-objDepth);
+  glTranslatef(0.0,circle->getCircleRadius()*1.1,-temp);
 
   if (drawType)
 	  glutSolidSphere(0.05, 16,16);
