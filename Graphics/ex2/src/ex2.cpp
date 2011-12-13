@@ -363,14 +363,16 @@ void display(void)
 	glColor3f(WHITE);
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity() ;
-	glTranslatef(0.0,1.1*objRadius,-objDepth);
+
+	glTranslatef(0.0,0.0,-objDepth);
 	if (!stateModelMove)
 		glMultMatrixf(currentTransform);
 	glMultMatrixf(sphereTransforms);
-
+	glTranslatef(0.0,1.1*objRadius,0.0);
 	// drawing a 3D light sphere
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
+
 
 
 	//drawing 2D circle
