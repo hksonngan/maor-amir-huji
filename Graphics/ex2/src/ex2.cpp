@@ -108,13 +108,11 @@ void updateOldTransformsMatrix()
 	glPushMatrix();
 	glLoadIdentity();
 	glMultMatrixf(currentTransform);
-	if (stateModelMove)
-	{
+	if (stateModelMove){
 		glMultMatrixf(oldTransforms);
 		glGetFloatv(GL_MODELVIEW_MATRIX,oldTransforms);
 	}
-	else
-	{
+	else{
 		glMultMatrixf(sphereTransforms);
 		glGetFloatv(GL_MODELVIEW_MATRIX,sphereTransforms);
 	}
@@ -204,7 +202,7 @@ int main(int argc, char * argv[])
 	printf("number of faces is %d\n", mesh.n_faces());
 	printf("number of edges is %d\n", mesh.n_edges());
 
-
+	//initial matrixs
 	initialMatrix(oldTransforms);
 	initialMatrix(sphereTransforms);
 	initialMatrix(currentTransform);
@@ -238,6 +236,32 @@ void viewPortCorrection()
 
 }
 
+void getRandomMaterial()
+{
+	float lowest=-1.0, highest=1.0;
+	float range=(highest-lowest);
+	int i=0;
+	//set ambient array
+	for (i=0;i<3;i++)
+		ambient[i] = lowest+range*rand()/(RAND_MAX + 1.0);
+	//set diffuse array
+	i=0;
+	for (i=0;i<3;i++)
+		diffuse[i] = lowest+range*rand()/(RAND_MAX + 1.0);
+	//set specular array
+	i=0;
+	for (i=0;i<3;i++)
+		specular[i] = lowest+range*rand()/(RAND_MAX + 1.0);
+
+}
+
+void setMaterial(){
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT, GL_SHININESS, shine);
+}
+
 /********************************************************************
  * Function  : init
  * Arguments : n/a
@@ -250,21 +274,16 @@ void viewPortCorrection()
 \******************************************************************/
 void initGL(void)
 {
-
-
-
+	//set initial normals
 	mesh.request_vertex_normals();
 	mesh.request_face_normals();
+
+	//for the random numbers generator
+	srand((unsigned)time(0));
 
 	// Set the background color to black (a shocking surprise)  //
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_SMOOTH);
-
-
-
-
-
-
 
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
@@ -273,10 +292,7 @@ void initGL(void)
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-	glMaterialf(GL_FRONT, GL_SHININESS, shine);
+	setMaterial();
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
@@ -298,30 +314,21 @@ void initGL(void)
 \******************************************************************/
 void display(void)
 {
-	//GLfloat temp = objDepth/(objDepth+objRadius);
+
 
 	GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.15,0.0, 0.0 };
 	//GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-
-
-
-
 	// Clear the screen buffer  //
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) ;
-
-
-
-
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
 	// and set the perspective with the current field of view, and the current height and width //
 	gluPerspective(fov, 1.0, objDepth - 2*objRadius, objDepth + 2*objRadius);
-	// just making sure
-	viewPortCorrection();
+
 	//draws the model
 	glColor3f(RED);
 	glMatrixMode(GL_MODELVIEW) ;
@@ -349,57 +356,36 @@ void display(void)
 		drawModel(mesh);
 	}
 
+	//drawing light source
+
+	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
+	glDisable(GL_LIGHTING);
+	glColor3f(WHITE);
+	glMatrixMode(GL_MODELVIEW) ;
+	glLoadIdentity() ;
+
+	if (!stateModelMove)
+		glMultMatrixf(currentTransform);
+	glMultMatrixf(sphereTransforms);
+	glTranslatef(0.0,1.1*objRadius,-objDepth);
+	// drawing a 3D light sphere
+	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
+	else glutWireSphere(0.07*objRadius, 16,16);
 
 
-
-
-
+	//drawing 2D circle
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(-1.0,1.0,-1.0,1.0);
-
-	//draw light source
-	glDisable(GL_LIGHTING);  //in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
-	glColor3f(1.0,1.0,1.0);
-
 	glMatrixMode(GL_MODELVIEW) ;
-		glLoadIdentity() ;
+	glLoadIdentity() ;
+	circle->drawCircle();
 
-		circle->drawCircle();
+	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
+	glEnable(GL_LIGHTING);
 
-
-
-		float objDepth = 4.0;
-		float objRadius = 1.0;
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(fov, 1.0, objDepth - 2*objRadius, objDepth + 2*objRadius);
-
-
-		glMatrixMode(GL_MODELVIEW) ;
-		glLoadIdentity() ;
-		glTranslatef(0.0,circle->getCircleRadius()*1.15,-objDepth);
-		if (!stateModelMove)
-			glMultMatrixf(currentTransform);
-		glMultMatrixf(sphereTransforms);
-
-
-		// drawing a 3D light sphere
-		if (drawType)
-
-			glutSolidSphere(0.05, 16,16);
-		else
-			glutWireSphere(0.05, 16,16);
-
-
-
-		glEnable(GL_LIGHTING); //in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
-
-
-		// Make sure everything gets painted  //
+	// Make sure everything gets painted  //
 	glFlush() ;
-
 
 	// Swap those buffers so someone will actually see the results... //
 	glutSwapBuffers();
@@ -486,6 +472,15 @@ void keyboard(unsigned char key, int x, int y)
 	case 'a':
 	{
 		stateModelMove = !stateModelMove;
+		glutPostRedisplay();
+		break;
+	}
+
+	case 'M':
+	case 'm':
+	{
+		getRandomMaterial();
+		setMaterial();
 		glutPostRedisplay();
 		break;
 	}

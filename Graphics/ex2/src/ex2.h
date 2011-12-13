@@ -2,14 +2,14 @@
 *  Author  :  
 * ID      : 
 * Course  : Computer Graphics
-* Project : Ex1
+* Project : Ex2
 *
 * Purpose : 
 *
 \********************************************************************/
 
-#ifndef __EX1_H__
-#define __EX1_H__
+#ifndef __EX2_H__
+#define __EX2_H__
 
 
 //////////////////////////////
@@ -64,6 +64,7 @@ using namespace std;
 //////////////////////////////
 #define GREEN 0.0,1.0,0.0
 #define RED 1.0,0.0,0.0
+#define WHITE 1.0,1.0,1.0
 
 
 
