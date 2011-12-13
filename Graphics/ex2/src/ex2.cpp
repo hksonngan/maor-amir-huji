@@ -55,6 +55,7 @@ GLfloat oldTransforms[16];
 GLfloat sphereTransforms[16];
 GLfloat currentTransform[16];
 
+
 //Mesh objects
 Mesh mesh;
 Mesh::Point lowerLeft(0,0,0);
@@ -66,10 +67,16 @@ float objectRealLength;
 bool drawType=false;
 bool normalTypeSmooth = false;
 bool stateModelMove = true;
+short lightType = 0;
 
-GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+
+//light parameters
+float spotAngle = NO_SPOT_ANGLE;
+//GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+//GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+//GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat light_position[]= { 0.0,0.0,0.0, 0.0 };
+
 
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat diffuse[] = {1.0, 0.8, 0.0, 1.0};
@@ -119,6 +126,8 @@ void updateOldTransformsMatrix()
 	glPopMatrix();
 
 }
+
+
 
 /*
  * based on the model, compute the distance between the lower left corner
@@ -213,6 +222,9 @@ int main(int argc, char * argv[])
 	// calculate new objRadius and objDepth
 	computeObjectInitScale();
 
+	//update initial light position
+	light_position[1] = objRadius*1.1;
+
 	// enter the main loop  //
 	glutMainLoop();
 
@@ -262,6 +274,8 @@ void setMaterial(){
 	glMaterialf(GL_FRONT, GL_SHININESS, shine);
 }
 
+
+
 /********************************************************************
  * Function  : init
  * Arguments : n/a
@@ -286,11 +300,15 @@ void initGL(void)
 	glShadeModel (GL_SMOOTH);
 
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+
+
 
 	setMaterial();
 
@@ -316,9 +334,12 @@ void display(void)
 {
 
 
-	GLfloat light_position[] = { 0.0,objRadius*1.1,0.0, 0.0 };
+	cout << "lightPos: " << light_position[0] << "," << light_position[1] << "," << light_position[2] << "," << light_position[3] << endl;
+	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+
 	//GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
 
 	// Clear the screen buffer  //
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) ;
@@ -369,11 +390,13 @@ void display(void)
 		glMultMatrixf(currentTransform);
 	glMultMatrixf(sphereTransforms);
 	glTranslatef(0.0,1.1*objRadius,0.0);
+
+
 	// drawing a 3D light sphere
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
-
-
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 
 	//drawing 2D circle
 	glMatrixMode(GL_PROJECTION);
@@ -385,6 +408,8 @@ void display(void)
 
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glEnable(GL_LIGHTING);
+
+
 
 	// Make sure everything gets painted  //
 	glFlush() ;
@@ -449,7 +474,7 @@ void keyboard(unsigned char key, int x, int y)
 		initialMatrix(oldTransforms);
 		initialMatrix(sphereTransforms);
 		fov = INITIAL_FOV;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	}
 
@@ -457,7 +482,7 @@ void keyboard(unsigned char key, int x, int y)
 	case 'w':
 	{
 		drawType = !drawType;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	}
 
@@ -465,7 +490,7 @@ void keyboard(unsigned char key, int x, int y)
 	case 'n':
 	{
 		normalTypeSmooth = !normalTypeSmooth;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	}
 
@@ -474,7 +499,7 @@ void keyboard(unsigned char key, int x, int y)
 	case 'a':
 	{
 		stateModelMove = !stateModelMove;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	}
 
@@ -483,13 +508,70 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		getRandomMaterial();
 		setMaterial();
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		break;
 	}
 
-
-	return;
+	case 'L':
+	case 'l':
+	{
+		lightType = (lightType+1) % 3;
+		cout << "Light type: " << lightType << endl;
+		switch (lightType){
+		case 0:{ //point light
+			cout << "here in 0" << endl;
+			spotAngle = NO_SPOT_ANGLE;
+			light_position[3] = 0.0;
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			break;
+		}
+		case 1:{ //spot light
+			cout << "here in 1" << endl;
+			//GLfloat spotDirection[] = {light_position[0],light_position[1],light_position[2]};
+			//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDirection);
+			light_position[3] = 1.0;
+			spotAngle = INITIAL_SPOT_ANGLE;
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			break;
+		}
+		case 2:{
+			cout << "here in 2" << endl;
+			spotAngle = NO_SPOT_ANGLE;
+			light_position[3] = 1.0;
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			break;
+		}
+		}
+		break;
 	}
+
+	case '+':
+	{
+		if (lightType == 1){
+		if (spotAngle < NO_SPOT_ANGLE/2)
+			cout <<"SpotAngle: " << spotAngle++ << endl;
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		//glutPostRedisplay();
+		}
+		break;
+	}
+
+	case '-':{
+
+		if (lightType == 1){
+		if (spotAngle > INITIAL_SPOT_ANGLE)
+			spotAngle--;
+		cout <<"SpotAngle: " << spotAngle << endl;
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		//glutPostRedisplay();
+		}
+		break;
+	}
+	}
+	glutPostRedisplay();
 }
 
 

@@ -57,6 +57,8 @@ using namespace std;
 
 #define INITIAL_FOV        30.0
 #define DEPTH2RADIUS_RATIO 4.52
+#define INITIAL_SPOT_ANGLE 5.0
+#define NO_SPOT_ANGLE 180.0
 
 
 //////////////////////////////
