@@ -339,7 +339,7 @@ void display(void)
 	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 
 	//GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
-
+	cout << "light angle: " << spotAngle << endl;
 
 	// Clear the screen buffer  //
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) ;
@@ -378,7 +378,7 @@ void display(void)
 	}
 
 	//drawing light source
-
+	GLfloat spotDirection[] = {0.0,0.0,0.0};
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glDisable(GL_LIGHTING);
 	glColor3f(WHITE);
@@ -386,17 +386,20 @@ void display(void)
 	glLoadIdentity() ;
 
 	glTranslatef(0.0,1.1*objRadius,0.0);
+	glTranslatef(0.0,0.0,-objDepth);
 	if (!stateModelMove)
 		glMultMatrixf(currentTransform);
 	glMultMatrixf(sphereTransforms);
 
-	glTranslatef(0.0,0.0,-objDepth);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+
 
 	// drawing a 3D light sphere
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+
 
 
 	//drawing 2D circle
@@ -475,6 +478,10 @@ void keyboard(unsigned char key, int x, int y)
 		initialMatrix(oldTransforms);
 		initialMatrix(sphereTransforms);
 		fov = INITIAL_FOV;
+		lightType=0;
+		spotAngle = NO_SPOT_ANGLE;
+		light_position[3] = 1.0;
+		drawType = false;
 		//glutPostRedisplay();
 		break;
 	}
@@ -523,29 +530,31 @@ void keyboard(unsigned char key, int x, int y)
 			cout << "here in 0" << endl;
 			spotAngle = NO_SPOT_ANGLE;
 			light_position[3] = 1.0;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glutPostRedisplay();
+			//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			//glutPostRedisplay();
+			//glutPostRedisplay();
 			break;
 		}
 		case 1:{ //spot light
 			cout << "here in 1" << endl;
-			//GLfloat spotDirection[] = {light_position[0],light_position[1],light_position[2]};
-			//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDirection);
+
 			light_position[3] = 1.0;
 			spotAngle = INITIAL_SPOT_ANGLE;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glutPostRedisplay();
+			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			//glutPostRedisplay();
+
 			break;
 		}
 		case 2:{ //directional
 			cout << "here in 2" << endl;
 			spotAngle = NO_SPOT_ANGLE;
 			light_position[3] = 0.0;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glutPostRedisplay();
+			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			//glutPostRedisplay();
+			//glutPostRedisplay();
 			break;
 		}
 		}
@@ -557,8 +566,8 @@ void keyboard(unsigned char key, int x, int y)
 		if (lightType == 1){
 		if (spotAngle < NO_SPOT_ANGLE/2)
 			cout <<"SpotAngle: " << spotAngle++ << endl;
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		glutPostRedisplay();
+		//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		//glutPostRedisplay();
 		}
 		break;
 	}
@@ -569,13 +578,15 @@ void keyboard(unsigned char key, int x, int y)
 		if (spotAngle > INITIAL_SPOT_ANGLE)
 			spotAngle--;
 		cout <<"SpotAngle: " << spotAngle << endl;
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		glutPostRedisplay();
+		//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		//glutPostRedisplay();
 		}
 		break;
 	}
 	}
+	cout << "Post redirect" << endl;
 	glutPostRedisplay();
+	return;
 }
 
 
