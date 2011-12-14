@@ -76,7 +76,7 @@ float spotAngle = NO_SPOT_ANGLE;
 //GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 //GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_position[]= { 0.0,0.0,0.0, 1.0 };
-
+GLfloat spotDirection[] = {0.0,0.0,0.0};
 
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat diffuse[] = {1.0, 0.8, 0.0, 1.0};
@@ -222,8 +222,9 @@ int main(int argc, char * argv[])
 	// calculate new objRadius and objDepth
 	computeObjectInitScale();
 
-	//update initial light position
-	//light_position[1] = objRadius*1.1;
+	//update initial light position and spot direction
+	light_position[1] = objRadius*1.1;
+	//spotDirection[1] = -objRadius*1.1;
 
 	// enter the main loop  //
 	glutMainLoop();
@@ -382,7 +383,7 @@ void display(void)
 	}
 
 	//drawing light source
-	GLfloat spotDirection[] = {0.0,0.0,0.0};
+
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glDisable(GL_LIGHTING);
 	glColor3f(WHITE);
@@ -397,12 +398,51 @@ void display(void)
 		glMultMatrixf(currentTransform);
 	glMultMatrixf(sphereTransforms);
 	glTranslatef(0.0,1.1*objRadius,0.0);
+
 	// drawing a 3D light sphere
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
 
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+	switch (lightType)
+	{
+	case 0:{
+		spotAngle = 180.0;
+		light_position[3] = 1.0;
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		break;
+	}
+	case 1:{
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+		break;
+	}
+	case 2:{
+
+		spotAngle = 180.0;
+		light_position[3] = 0.0;
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+		break;
+
+	}
+
+
+
+	}
+
+
+
+/*
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+	if (lightType == 2)
+		glLightfv(GL_LIGHT0, GL_POSITION, spotDirection);
+	else glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	if (lightType==1 || lightType == 2){
+		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+	}
+*/
 
 
 	//drawing 2D circle
@@ -532,23 +572,24 @@ void keyboard(unsigned char key, int x, int y)
 		switch (lightType){
 		case 0:{ //point light
 			cout << "here in 0" << endl;
-			spotAngle = NO_SPOT_ANGLE;
 			light_position[3] = 1.0;
+			spotDirection[1] = 0.0;
+			spotAngle = NO_SPOT_ANGLE;
 			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 			break;
 		}
 		case 1:{ //spot light
 			cout << "here in 1" << endl;
 			light_position[3] = 1.0;
+			spotDirection[1] = -1.0;
 			spotAngle = INITIAL_SPOT_ANGLE;
 			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-
-
 			break;
 		}
 		case 2:{ //directional
 			cout << "here in 2" << endl;
-			light_position[3] = 1.0;
+			light_position[3] = 0.0;
+			spotDirection[1] = 0.0;
 			spotAngle = NO_SPOT_ANGLE;
 			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 			break;
@@ -684,6 +725,10 @@ void motion(int x, int y)
 }
 
 
+//////////////////////////////
+// OpenMesh functions       //
+//////////////////////////////
+
 void drawSolid(Mesh& mesh)
 {
 
@@ -711,23 +756,17 @@ void drawSolid(Mesh& mesh)
 					normal = mesh.normal(vHandle);
 				else
 					normal = mesh.normal(fHandle);
-
 				glNormal3f(normal[0],normal[1],normal[2]);
 				glVertex3d(point[0],point[1],point[2]);
-
 			}
 			glEnd();
-
-
 		}
 	}
 }
 
 
 
-	//////////////////////////////
-	// OpenMesh functions       //
-	//////////////////////////////
+
 
 	/*
 	 * iterating over the edges in the model. Drawing every edge to the screen.
@@ -749,21 +788,11 @@ void drawSolid(Mesh& mesh)
 			eHandle = eIter.handle();
 			vHandle1 = mesh.from_vertex_handle(mesh.halfedge_handle(eHandle,0));
 			vHandle2 = mesh.to_vertex_handle(mesh.halfedge_handle(eHandle,0));
-
-
 			p1 = mesh.point(vHandle1);
 			p2 = mesh.point(vHandle2);
-
-
 			glVertex3f(p1[0],p1[1],p1[2]);
 			glVertex3f(p2[0],p2[1],p2[2]);
-
-
-
-
-
 		}
-
 		glEnd();
 	}
 
