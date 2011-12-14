@@ -355,7 +355,66 @@ void display(void)
 	// and set the perspective with the current field of view, and the current height and width //
 	gluPerspective(fov, 1.0, objDepth - 2*objRadius, objDepth + 2*objRadius);
 
+	//draws the lightSource
+	glDisable(GL_LIGHTING);
+	glColor3f(WHITE);
+	glMatrixMode(GL_MODELVIEW) ;
+	glLoadIdentity() ;
+
+
+	glTranslatef(0.0,0.0,-objDepth);
+	if (!stateModelMove)
+		glMultMatrixf(currentTransform);
+	glMultMatrixf(sphereTransforms);
+	glTranslatef(0.0,1.1*objRadius,0.0);
+
+	// drawing a 3D light sphere
+	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
+	else glutWireSphere(0.07*objRadius, 16,16);
+
+	switch (lightType){
+
+			case 0:{ //point light
+			cout << "here in 0" << endl;
+			light_position[3] = 1.0;
+			light_position[1] = 0.0;
+			spotAngle = NO_SPOT_ANGLE;
+			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		}
+		case 1:{ //spot light
+			cout << "here in 1" << endl;
+			cout << "spot angle:" << spotAngle << endl;
+			light_position[3] = 1.0;
+			light_position[1] = 0.0;
+			spotDirection[1] = -1.0;
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			break;
+		}
+		case 2:{ //directional
+			cout << "here in 2" << endl;
+			light_position[3] = 0.0;
+			light_position[1] = 1.0;
+			spotAngle = NO_SPOT_ANGLE;
+			spotDirection[1] = 1.0;
+
+			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		}
+	}
+
+
+
+
+
+
 	//draws the model
+	glEnable(GL_LIGHTING);
 	glColor3f(RED);
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity();
@@ -386,7 +445,7 @@ void display(void)
 
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glDisable(GL_LIGHTING);
-	glColor3f(WHITE);
+/*	glColor3f(WHITE);
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity() ;
 
@@ -401,34 +460,6 @@ void display(void)
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
 
-
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-/*	switch (lightType)
-	{
-	case 0:{
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-		break;
-	}
-	case 1:{
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-		break;
-	}
-	case 2:{
-		//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		//glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-		glLightfv(GL_LIGHT0, GL_POSITION, spotDirection);
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		break;
-
-	}
-
-
-
-	}*/
 	switch (lightType){
 
 			case 0:{ //point light
@@ -470,19 +501,7 @@ void display(void)
 
 
 
-
-
-//	if (lightType == 1)
-/*	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-	if (lightType == 2)
-		glLightfv(GL_LIGHT0, GL_POSITION, spotDirection);
-	else glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	if (lightType==1){
-		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-	}
 */
-
 
 	//drawing 2D circle
 	glMatrixMode(GL_PROJECTION);
@@ -607,8 +626,6 @@ void keyboard(unsigned char key, int x, int y)
 		if (drawType){
 		lightType = (lightType+1) % 3;
 		if (lightType == 1) spotAngle = INITIAL_SPOT_ANGLE;
-		cout << "here before" << endl;
-		glutPostRedisplay();
 /*		switch (lightType){
 		case 0:{ //point light
 			cout << "here in 0" << endl;
