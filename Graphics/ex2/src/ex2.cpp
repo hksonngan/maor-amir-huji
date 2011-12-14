@@ -442,6 +442,7 @@ void display(void)
 		}
 		case 1:{ //spot light
 			cout << "here in 1" << endl;
+			cout << "spot angle:" << spotAngle << endl;
 			light_position[3] = 1.0;
 			light_position[1] = 0.0;
 			spotDirection[1] = -1.0;
@@ -455,10 +456,10 @@ void display(void)
 			light_position[3] = 0.0;
 			light_position[1] = 1.0;
 			spotAngle = NO_SPOT_ANGLE;
+			spotDirection[1] = -1.0;
 			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-
-
+			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
 			break;
 		}
 	}
