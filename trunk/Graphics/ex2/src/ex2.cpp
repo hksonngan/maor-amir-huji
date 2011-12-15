@@ -303,7 +303,7 @@ void addModelToScene(){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		drawSolid(mesh);
+		drawModel(mesh);
 	}
 	else{ //case of wireframe model to be drawn
 		glDisable(GL_LIGHTING);
@@ -313,17 +313,17 @@ void addModelToScene(){
 			glEnable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glColor3f(RED);
-			drawSolid(mesh);
+			drawModel(mesh);
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0, 1.0);
 			glColor3f(BLACK);
-			drawSolid(mesh);
+			drawModel(mesh);
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			}
 		else
-			drawSolid(mesh);
+			drawModel(mesh);
 	}
 }
 
@@ -673,7 +673,7 @@ void motion(int x, int y)
  * iterating over the faces in the model. Drawing every face as a polygon to the screen.
  * mesh - the mesh object of the model
  */
-void drawSolid(Mesh& mesh)
+void drawModel(Mesh& mesh)
 {
 
 	Mesh::FaceIter fIter;
