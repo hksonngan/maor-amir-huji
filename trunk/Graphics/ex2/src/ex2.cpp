@@ -67,6 +67,7 @@ float objectRealLength;
 bool drawType=false;
 bool normalTypeSmooth = false;
 bool stateModelMove = true;
+bool hiddenSufaceRemovalEnable = false;
 short lightType = 0;
 
 
@@ -76,7 +77,9 @@ GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_position[]= { 0.0,0.0,0.0, 1.0 };
+//GLfloat light_position_directional[]= { 0.0,0.0,0.0, 0.0 };
 GLfloat spotDirection[] = {0.0,0.0,0.0};
+//GLfloat spotDirection_directional[] = {0.0,0.0,1.0};
 
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat diffuse[] = {1.0, 0.8, 0.0, 1.0};
@@ -276,6 +279,67 @@ void setMaterial(){
 }
 
 
+void addLightToScene(){
+	switch (lightType){
+				case 0:{ //point light
+				light_position[3] = 1.0;
+				light_position[1] = 0.0;
+				spotAngle = NO_SPOT_ANGLE;
+				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+				break;
+			}
+			case 1:{ //spot light
+				light_position[3] = 1.0;
+				light_position[1] = 0.0;
+				spotDirection[1] = -1.0;
+				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+				glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+				break;
+			}
+			case 2:{ //directional
+				light_position[3] = 0.0;
+				light_position[1] = 1.0;
+				spotAngle = NO_SPOT_ANGLE;
+				spotDirection[1] = 1.0;
+				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+				glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+				break;
+			}
+		}
+}
+
+void addModelToScene(){
+	if (drawType){
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		drawSolid(mesh);
+	}
+	else{
+		glDisable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		if (hiddenSufaceRemovalEnable){
+			glEnable(GL_DEPTH_TEST);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glColor3f(RED);
+			drawSolid(mesh);
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+			glColor3f(BLACK);
+			drawSolid(mesh);
+			glDisable(GL_POLYGON_OFFSET_FILL);
+			}
+		else
+			drawSolid(mesh);
+	}
+}
+
+
 
 /********************************************************************
  * Function  : init
@@ -331,20 +395,9 @@ void initGL(void)
  *
  *
 \******************************************************************/
-int counter = 0;
+
 void display(void)
 {
-
-
-	//cout << "lightPos: " << light_position[0] << "," << light_position[1] << "," << light_position[2] << "," << light_position[3] << endl;
-	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-
-	//GLfloat light_position[] = { 0.0,circle->getCircleRadius()*1.1,-temp, 0.0 };
-	//cout << "light angle: " << spotAngle << endl;
-
-	cout << "in Redirect: " << counter << endl;
-	counter++;
 
 	// Clear the screen buffer  //
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) ;
@@ -372,45 +425,8 @@ void display(void)
 	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
 	else glutWireSphere(0.07*objRadius, 16,16);
 
-	switch (lightType){
-
-			case 0:{ //point light
-			cout << "here in 0" << endl;
-			light_position[3] = 1.0;
-			light_position[1] = 0.0;
-			spotAngle = NO_SPOT_ANGLE;
-			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			break;
-		}
-		case 1:{ //spot light
-			cout << "here in 1" << endl;
-			cout << "spot angle:" << spotAngle << endl;
-			light_position[3] = 1.0;
-			light_position[1] = 0.0;
-			spotDirection[1] = -1.0;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			break;
-		}
-		case 2:{ //directional
-			cout << "here in 2" << endl;
-			light_position[3] = 0.0;
-			light_position[1] = 1.0;
-			spotAngle = NO_SPOT_ANGLE;
-			spotDirection[1] = 1.0;
-
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			break;
-		}
-	}
-
-
-
-
+	//adding light according to light type
+	addLightToScene();
 
 
 	//draws the model
@@ -430,78 +446,13 @@ void display(void)
 	//updating normals
 	mesh.update_normals();
 
-	if (drawType){
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		drawSolid(mesh);
-	}
-	else{
-		glDisable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		drawModel(mesh);
-	}
+	//drawing the model
+	addModelToScene();
 
 	//drawing light source
 
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glDisable(GL_LIGHTING);
-/*	glColor3f(WHITE);
-	glMatrixMode(GL_MODELVIEW) ;
-	glLoadIdentity() ;
-
-
-	glTranslatef(0.0,0.0,-objDepth);
-	if (!stateModelMove)
-		glMultMatrixf(currentTransform);
-	glMultMatrixf(sphereTransforms);
-	glTranslatef(0.0,1.1*objRadius,0.0);
-
-	// drawing a 3D light sphere
-	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
-	else glutWireSphere(0.07*objRadius, 16,16);
-
-	switch (lightType){
-
-			case 0:{ //point light
-			cout << "here in 0" << endl;
-			light_position[3] = 1.0;
-			light_position[1] = 0.0;
-			spotAngle = NO_SPOT_ANGLE;
-			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			break;
-		}
-		case 1:{ //spot light
-			cout << "here in 1" << endl;
-			cout << "spot angle:" << spotAngle << endl;
-			light_position[3] = 1.0;
-			light_position[1] = 0.0;
-			spotDirection[1] = -1.0;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			break;
-		}
-		case 2:{ //directional
-			cout << "here in 2" << endl;
-			light_position[3] = 0.0;
-			light_position[1] = 1.0;
-			spotAngle = NO_SPOT_ANGLE;
-			spotDirection[1] = -1.0;
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-			break;
-		}
-	}
-
-
-
-
-
-
-
-*/
 
 	//drawing 2D circle
 	glMatrixMode(GL_PROJECTION);
@@ -513,8 +464,6 @@ void display(void)
 
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glEnable(GL_LIGHTING);
-
-
 
 	// Make sure everything gets painted  //
 	glFlush() ;
@@ -582,7 +531,6 @@ void keyboard(unsigned char key, int x, int y)
 		spotAngle = NO_SPOT_ANGLE;
 		light_position[3] = 1.0;
 		drawType = false;
-		//glutPostRedisplay();
 		break;
 	}
 
@@ -590,7 +538,6 @@ void keyboard(unsigned char key, int x, int y)
 	case 'w':
 	{
 		drawType = !drawType;
-		//glutPostRedisplay();
 		break;
 	}
 
@@ -598,7 +545,6 @@ void keyboard(unsigned char key, int x, int y)
 	case 'n':
 	{
 		normalTypeSmooth = !normalTypeSmooth;
-		//glutPostRedisplay();
 		break;
 	}
 
@@ -607,7 +553,6 @@ void keyboard(unsigned char key, int x, int y)
 	case 'a':
 	{
 		stateModelMove = !stateModelMove;
-		//glutPostRedisplay();
 		break;
 	}
 
@@ -616,7 +561,12 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		getRandomMaterial();
 		setMaterial();
-		//glutPostRedisplay();
+		break;
+	}
+
+	case 'h':
+	case 'H':{
+		hiddenSufaceRemovalEnable = !hiddenSufaceRemovalEnable;
 		break;
 	}
 
@@ -626,32 +576,6 @@ void keyboard(unsigned char key, int x, int y)
 		if (drawType){
 		lightType = (lightType+1) % 3;
 		if (lightType == 1) spotAngle = INITIAL_SPOT_ANGLE;
-/*		switch (lightType){
-		case 0:{ //point light
-			cout << "here in 0" << endl;
-			light_position[3] = 1.0;
-			spotDirection[1] = 0.0;
-			spotAngle = NO_SPOT_ANGLE;
-			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			break;
-		}
-		case 1:{ //spot light
-			cout << "here in 1" << endl;
-			light_position[3] = 1.0;
-			spotDirection[1] = -1.0;
-			spotAngle = INITIAL_SPOT_ANGLE;
-			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			break;
-		}
-		case 2:{ //directional
-			cout << "here in 2" << endl;
-			light_position[3] = 0.0;
-			spotDirection[1] = 0.0;
-			spotAngle = NO_SPOT_ANGLE;
-			//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-			break;
-		}
-		}*/
 		}
 
 		break;
