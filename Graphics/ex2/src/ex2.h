@@ -57,7 +57,7 @@ using namespace std;
 
 #define INITIAL_FOV        30.0
 #define DEPTH2RADIUS_RATIO 4.52
-#define INITIAL_SPOT_ANGLE 5.0
+#define INITIAL_SPOT_ANGLE 10.0
 #define NO_SPOT_ANGLE 180.0
 
 
@@ -67,6 +67,7 @@ using namespace std;
 #define GREEN 0.0,1.0,0.0
 #define RED 1.0,0.0,0.0
 #define WHITE 1.0,1.0,1.0
+#define BLACK 0.0,0.0,0.0
 
 
 
