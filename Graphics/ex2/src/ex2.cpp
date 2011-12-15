@@ -73,7 +73,7 @@ short lightType = 0;
 
 //light parameters
 float spotAngle = NO_SPOT_ANGLE;
-GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+GLfloat light_ambient[] = { 0.8, 0.0, 0.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_position[]= { 0.0,0.0,0.0, 1.0 };
@@ -81,8 +81,8 @@ GLfloat light_position_directional[]= { 0.0,1.0,0.0, 0.0 };
 GLfloat spotDirection[] = {0.0,-1.0,0.0};
 GLfloat spotDirection_directional[] = {0.0,0.0,1.0};
 
-GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
-GLfloat diffuse[] = {1.0, 0.8, 0.0, 1.0};
+GLfloat ambient[] = {0.1, 0.0, 0.0, 1.0};
+GLfloat diffuse[] = {0.65, 0.0, 0.0, 1.0};
 GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
 GLfloat shine = 100.0;
 
