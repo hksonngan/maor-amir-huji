@@ -1,7 +1,7 @@
 CC = g++ -Wall -Wno-deprecated
 EXEC = ex2
-HDRS = ex2.h
-SRCS = ex2.cpp
+HDRS = circle.h arcBall.h ex2.h
+SRCS = circle.cpp arcBall.cpp ex2.cpp
 OBJS = $(subst .cpp,.o,$(SRCS)) 		#substituting .cpp -> .o
 
 #OpenMesh definitions
