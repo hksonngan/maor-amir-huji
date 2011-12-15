@@ -294,7 +294,7 @@ void addLightToScene(){
 				light_position[3] = 0.0;
 				light_position[1] = 1.0;
 				spotAngle = NO_SPOT_ANGLE;
-				spotDirection[1] = 1.0;
+				//spotDirection[1] = 1.0;
 				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 				//glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
@@ -407,7 +407,11 @@ void display(void)
 	glTranslatef(0.0,1.1*objRadius,0.0);
 
 	// drawing a 3D light sphere
-	if (drawType) glutSolidSphere(0.07*objRadius, 16,16);
+	if (drawType) {
+		//
+		glutSolidSphere(0.07*objRadius, 16,16);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 	else glutWireSphere(0.07*objRadius, 16,16);
 
 	//adding light according to light type
