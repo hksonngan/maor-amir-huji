@@ -73,7 +73,7 @@ short lightType = 0;
 
 //light parameters
 float spotAngle = NO_SPOT_ANGLE;
-GLfloat light_ambient[] = { 0.8, 0.0, 0.0, 1.0 };
+GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_position[]= { 0.0,0.0,0.0, 1.0 };
@@ -245,17 +245,10 @@ void getRandomMaterial()
 	float lowest=-1.0, highest=1.0;
 	float range=(highest-lowest);
 	int i=0;
-	//set ambient array
-	for (i=0;i<3;i++)
-		ambient[i] = lowest+range*rand()/(RAND_MAX + 1.0);
-	//set diffuse array
-	i=0;
+	//changing diffuse array
 	for (i=0;i<3;i++)
 		diffuse[i] = lowest+range*rand()/(RAND_MAX + 1.0);
-	//set specular array
-	i=0;
-	for (i=0;i<3;i++)
-		specular[i] = lowest+range*rand()/(RAND_MAX + 1.0);
+
 
 }
 
