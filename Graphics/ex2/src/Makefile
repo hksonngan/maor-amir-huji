@@ -15,9 +15,6 @@ COMP_FLAGS = -O2 -I/usr/include -I/usr/X11R6/include $(OM_INCLUDE)
 
 all: ex2 run
 
-run:
-	ex2 ../models/dragon_10k.off
-
 ex2: arcBall.cpp circle.cpp ex2.cpp
 	$(CC) $(COMP_FLAGS) $(LINK_FLAGS)  arcBall.cpp circle.cpp ex2.cpp  -o ex2	
 
