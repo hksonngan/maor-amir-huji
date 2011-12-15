@@ -77,9 +77,9 @@ GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_position[]= { 0.0,0.0,0.0, 1.0 };
-//GLfloat light_position_directional[]= { 0.0,0.0,0.0, 0.0 };
-GLfloat spotDirection[] = {0.0,0.0,0.0};
-//GLfloat spotDirection_directional[] = {0.0,0.0,1.0};
+GLfloat light_position_directional[]= { 0.0,1.0,0.0, 0.0 };
+GLfloat spotDirection[] = {0.0,-1.0,0.0};
+GLfloat spotDirection_directional[] = {0.0,0.0,1.0};
 
 GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
 GLfloat diffuse[] = {1.0, 0.8, 0.0, 1.0};
@@ -275,29 +275,20 @@ void setMaterial(){
 void addLightToScene(){
 	switch (lightType){
 				case 0:{ //point light
-				light_position[3] = 1.0;
-				light_position[1] = 0.0;
 				spotAngle = NO_SPOT_ANGLE;
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 				break;
 			}
 			case 1:{ //spot light
-				light_position[3] = 1.0;
-				light_position[1] = 0.0;
-				spotDirection[1] = -1.0;
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 				glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
 				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
 				break;
 			}
 			case 2:{ //directional
-				light_position[3] = 0.0;
-				light_position[1] = 1.0;
 				spotAngle = NO_SPOT_ANGLE;
-				//spotDirection[1] = 1.0;
 				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-				//glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+				glLightfv(GL_LIGHT0, GL_POSITION, light_position_directional);
 				break;
 			}
 		}
