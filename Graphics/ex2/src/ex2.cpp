@@ -152,7 +152,6 @@ void computeObjectInitScale()
 
 	objRadius = diff_up > diff_low ? diff_up : diff_low;
 	objDepth = DEPTH2RADIUS_RATIO*objRadius;
-	cout << "objDepth= " <<objDepth <<endl;
 }
 
 
@@ -198,21 +197,13 @@ int main(int argc, char * argv[])
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 
-
-
-
 	// try to load the mesh from the given input file //
-
 	if (!OpenMesh::IO::read_mesh(mesh, argv[ARGUMENTS_INPUTFILE]))
 	{
 		// if we didn't make it, exit...  //
 		fprintf(stderr, "Error loading mesh, Aborting.\n");
 		return RC_INPUT_ERROR;
 	}
-
-	printf("number of vertices is %d\n", mesh.n_vertices());
-	printf("number of faces is %d\n", mesh.n_faces());
-	printf("number of edges is %d\n", mesh.n_edges());
 
 	//initial matrixs
 	initialMatrix(oldTransforms);
@@ -224,10 +215,6 @@ int main(int argc, char * argv[])
 
 	// calculate new objRadius and objDepth
 	computeObjectInitScale();
-
-	//update initial light position and spot direction
-	//light_position[1] = objRadius*1.1;
-	//spotDirection[1] = -objRadius*1.1;
 
 	// enter the main loop  //
 	glutMainLoop();
@@ -243,15 +230,16 @@ int main(int argc, char * argv[])
 void viewPortCorrection()
 {
 	int maxSize = width > height ?  width : height;
-	if (width > height) {
+	if (width > height)
 		glViewport(0,(height - width)/2.0,maxSize,maxSize);
-	}
-	else {
+	else
 		glViewport((width - height)/2.0,0,maxSize,maxSize);
-	}
 
 }
 
+/*
+ * sets material array with random values.
+ */
 void getRandomMaterial()
 {
 	float lowest=-1.0, highest=1.0;
@@ -271,6 +259,9 @@ void getRandomMaterial()
 
 }
 
+/*
+ * set material of model according to material array
+ */
 void setMaterial(){
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
@@ -278,7 +269,9 @@ void setMaterial(){
 	glMaterialf(GL_FRONT, GL_SHININESS, shine);
 }
 
-
+/*
+ * adding light to the screen according to the light type.
+ */
 void addLightToScene(){
 	switch (lightType){
 				case 0:{ //point light
@@ -303,25 +296,29 @@ void addLightToScene(){
 				spotAngle = NO_SPOT_ANGLE;
 				spotDirection[1] = 1.0;
 				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-				glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+				//glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 				break;
 			}
 		}
 }
 
+/*
+ * adding the model to the screen according to draw type(shaded or wireframe)
+ * and hidden surface removal state.
+ */
 void addModelToScene(){
-	if (drawType){
+	if (drawType){ //case of shaded model to be drawn
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		drawSolid(mesh);
 	}
-	else{
+	else{ //case of wireframe model to be drawn
 		glDisable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		if (hiddenSufaceRemovalEnable){
+		if (hiddenSufaceRemovalEnable){ //case hidden surface removal is enabled
 			glEnable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glColor3f(RED);
@@ -338,7 +335,6 @@ void addModelToScene(){
 			drawSolid(mesh);
 	}
 }
-
 
 
 /********************************************************************
@@ -364,24 +360,15 @@ void initGL(void)
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_SMOOTH);
 
-
+	// Set light parameters //
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-
-
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-
-
-
 	setMaterial();
-
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-
-
-
 	return;
 }
 
@@ -398,7 +385,6 @@ void initGL(void)
 
 void display(void)
 {
-
 	// Clear the screen buffer  //
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) ;
 
@@ -409,12 +395,11 @@ void display(void)
 	gluPerspective(fov, 1.0, objDepth - 2*objRadius, objDepth + 2*objRadius);
 
 	//draws the lightSource
+
 	glDisable(GL_LIGHTING);
 	glColor3f(WHITE);
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity() ;
-
-
 	glTranslatef(0.0,0.0,-objDepth);
 	if (!stateModelMove)
 		glMultMatrixf(currentTransform);
@@ -428,17 +413,14 @@ void display(void)
 	//adding light according to light type
 	addLightToScene();
 
-
 	//draws the model
 	glEnable(GL_LIGHTING);
 	glColor3f(RED);
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity();
 	glTranslatef(0.0,0.0, (-1)*objDepth);
-	if (stateModelMove)
-		glMultMatrixf(currentTransform);
+	if (stateModelMove)	glMultMatrixf(currentTransform);
 	glMultMatrixf(oldTransforms);
-
 
 	//fixing the model to fit our screen
 	glTranslatef(-center[0],-center[1],-center[2]);
@@ -448,8 +430,6 @@ void display(void)
 
 	//drawing the model
 	addModelToScene();
-
-	//drawing light source
 
 	//in case of LIGHTING enable closes the light source.otherwise doesn't change nothing
 	glDisable(GL_LIGHTING);
@@ -485,13 +465,11 @@ void display(void)
 \******************************************************************/
 void reshape(int w, int h)
 {
-
 	width = w;
 	height = h;
 	glMatrixMode(GL_PROJECTION);
 	viewPortCorrection();
 	glutPostRedisplay();
-
 	return;
 }
 
@@ -548,7 +526,6 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	}
 
-
 	case 'A':
 	case 'a':
 	{
@@ -577,7 +554,6 @@ void keyboard(unsigned char key, int x, int y)
 		lightType = (lightType+1) % 3;
 		if (lightType == 1) spotAngle = INITIAL_SPOT_ANGLE;
 		}
-
 		break;
 	}
 
@@ -586,29 +562,21 @@ void keyboard(unsigned char key, int x, int y)
 		if (lightType == 1){
 		if (spotAngle < NO_SPOT_ANGLE/2)
 			spotAngle++;
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		//glutPostRedisplay();
 		}
 		break;
 	}
 
 	case '-':{
-
 		if (lightType == 1){
 		if (spotAngle > INITIAL_SPOT_ANGLE)
 			spotAngle--;
-		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-		//glutPostRedisplay();
 		}
 		break;
 	}
 	}
-	cout << "here in post redirect" << endl;
 	glutPostRedisplay();
 	return;
 }
-
-
 
 
 /*
@@ -634,8 +602,6 @@ void normalize_mouse_coordinates(float x,float y)
  * Purpose   :   This function handles mouse actions.
  *
 \******************************************************************/
-
-
 void mouse(int button, int state, int x, int y)
 {
 	normalize_mouse_coordinates(x,y);
@@ -708,7 +674,10 @@ void motion(int x, int y)
 //////////////////////////////
 // OpenMesh functions       //
 //////////////////////////////
-
+/*
+ * iterating over the faces in the model. Drawing every face as a polygon to the screen.
+ * mesh - the mesh object of the model
+ */
 void drawSolid(Mesh& mesh)
 {
 
@@ -743,38 +712,6 @@ void drawSolid(Mesh& mesh)
 		}
 	}
 }
-
-
-
-
-
-	/*
-	 * iterating over the edges in the model. Drawing every edge to the screen.
-	 * mesh - the mesh object of the model
-	 */
-	void drawModel(Mesh& mesh)
-	{
-		Mesh::EdgeIter eIter;
-		Mesh::EdgeHandle eHandle;
-		Mesh::VertexHandle vHandle1,vHandle2;
-		Mesh::Point p1,p2;
-
-
-
-
-		glBegin(GL_LINES);
-		for (eIter = mesh.edges_begin();eIter != mesh.edges_end(); ++eIter)
-		{  //glViewport(0,0,width,height);
-			eHandle = eIter.handle();
-			vHandle1 = mesh.from_vertex_handle(mesh.halfedge_handle(eHandle,0));
-			vHandle2 = mesh.to_vertex_handle(mesh.halfedge_handle(eHandle,0));
-			p1 = mesh.point(vHandle1);
-			p2 = mesh.point(vHandle2);
-			glVertex3f(p1[0],p1[1],p1[2]);
-			glVertex3f(p2[0],p2[1],p2[2]);
-		}
-		glEnd();
-	}
 
 	/*
   This function computes the geometrical center and
