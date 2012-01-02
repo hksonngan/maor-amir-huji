@@ -1,0 +1,120 @@
+class Board
+{
+	field Array cols;
+	field Array players_cols;
+	field boolean turn;
+	constructor Board new() {
+		var int i,j;
+		var Array temp;
+		let i =0;
+		let cols = Array.new(7);
+		while (i<7)
+		{
+			let temp = Array.new(7);
+			let cols[i] = temp;
+			let i = i +1;
+		}
+		do Output.println();
+		do Output.printString("schuna");
+		do Output.println();
+		let players_cols = Array.new(7);
+		let i =0;
+		let j =0;
+		while (i<7)
+		{
+			let temp = Array.new(6);
+			while (j<6)
+			{
+				let temp[j]=0;
+				let j = j + 1;
+			}
+			let j = 0;
+			let players_cols[i] = temp;
+			let i = i +1;
+		}
+		do Output.printString("schuna");
+		do Output.println();
+		return this;
+	}
+	
+	method int playerNumber()
+	{
+		if (turn)
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
+	
+	
+	method void print()
+	{
+		
+		var int i,j;
+		var Array r;
+		
+		/*
+		let i = 0;
+		let j = 0;
+		while (i<7)
+		{
+			let r = cols[i];
+			while (j<6)
+			{
+				let r[j] = i*10 + j;
+				let j = j +1;
+			}
+			let j = 0;
+			let i = i +1;
+		}
+		*/
+		let i =0;
+		let j=0;
+		while (i<7)
+		{
+			let r = players_cols[i];
+			while (j<6)
+			{
+				do Output.printInt(r[j]);
+				do Output.printString(",");
+				
+				let j = j +1;
+				
+			}
+			do Output.println();
+			let j = 0;
+			let i = i +1;
+		}
+		
+		return;
+	}
+	
+	method void putPlayer(int k)
+	{
+		var Piece p;
+		var int i, exact;
+		var Array current;
+		let i =-1;
+		let p = Piece.new(turn);
+		let current = players_cols[k];
+		while(((current[(i+1)] =0)) & (i<5))
+		{
+			let i = i + 1;
+		}
+		if ( i = -1)
+		{
+			return;
+		}
+
+		let exact = i;
+		let current[exact]=playerNumber();
+		let current = cols[k];
+		let current[exact] = p;
+		do p.drawPiece(k,exact);
+		let turn = ~turn;
+		return;
+	}
+}
