@@ -1,0 +1,58 @@
+class Piece
+{
+	field int x,y,r_max,r_min,jump,x_start,y_start;
+	field boolean isX;
+	constructor Piece new(boolean type)
+	{
+		let r_max = 12;
+		let r_min = 9;
+		let jump = 28;
+		let x_start = 270;
+		let y_start = 41;
+		let isX = type;
+		return this;
+	}
+	
+	
+	method void draw()
+	{
+		if (isX)
+		{
+			do Screen.setColor(true);
+			do Screen.drawCircle(x,y,r_max);
+		}
+		else
+		{
+			do Screen.setColor(true);
+			do Screen.drawCircle(x,y,r_max);
+			do Screen.setColor(false);
+			do Screen.drawCircle(x,y,r_min);
+		}
+		return;
+	}
+	
+	method void erase()
+	{
+		do Screen.setColor(false);
+		do Screen.drawCircle(x,y,r_max);
+		return;
+	}
+	
+	method void drawPiece(int i, int j)
+	{
+		let x = x_start + (i*jump);
+		let y = y_start + (j*jump);
+		do draw();
+		return;
+	}
+	
+	method void movePiece(int i, int j)
+	{
+		do erase();
+		let x = x_start + (i*jump);
+		let y = y_start + (j*jump);
+		do draw();
+		return;
+	}
+	
+}
