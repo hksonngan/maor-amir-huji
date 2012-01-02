@@ -1,0 +1,56 @@
+class Shot{
+
+	field Square sq;
+	field bool isShot;
+	constructor Shot new() {
+        // let sq = Square.new(newX, newY, 5);
+		let isShot = false;
+        return this;
+    }
+	
+	method void shoot( int shooterX, int shooterSize)
+	{
+		if (isShot)
+		{
+			return;
+		}
+		let isShot = true;
+		let sq = Square.new((shooterX + (shooterSize/2)-2) + 1 ,256 -  shooterSize - 4 , 2);
+		return;
+	}
+	
+	method void resumeShot(Aliens targets)
+	{
+		var int start_y;
+		if (isShot)
+		{
+			
+			let start_y = sq.getY();
+			do sq.moveUp(1);
+			/*
+			if ( target.isInside(sq.getX(),sq.getY()))
+			{
+				let isShot = false;
+				do target.die();
+				do sq.erase();
+				return;
+			}
+			*/
+			if(targets.shot(sq.getX(),sq.getY()))
+			{
+				let isShot = false;
+				do sq.erase();
+			}
+			if (start_y = sq.getY())
+			{
+				let isShot = false;
+				do sq.erase();
+			}
+		}
+		
+		return;
+	}
+	
+
+
+}

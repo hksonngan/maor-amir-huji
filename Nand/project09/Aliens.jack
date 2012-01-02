@@ -1,0 +1,83 @@
+class Aliens
+{
+	field Array targets;
+	field int deads, numAliens;
+	
+	constructor Aliens new()
+	{
+		var int i;
+		var Alien a;
+		let numAliens = 8;
+		let targets = Array.new(numAliens);
+		let deads = 0;
+		
+		let i =0;
+		while (i<numAliens)
+		{
+			let a = Alien.new(50+(i*50),100);
+			let targets[i] = a;
+			let i = i + 1;
+		}
+		return this;
+	}
+	
+	method void allAlive()
+	{
+		var int i;
+		var Alien a;
+		let i = 0;
+		
+		while ( i < numAliens)
+		{
+			let a = targets[i];
+			do a.raiseAlien();
+			//do Output.printInt(a.getX());
+			//do Output.println();
+			//do Output.printInt(a.getY());
+			//do Output.println();
+			let i = i + 1;
+		}
+		return;
+	}
+
+	method boolean shot(int shotX, int shotY)
+	{
+		var int i;
+		var Alien a;
+		if ( (shotY > 150) | (shotY < 50))
+		{
+			return false;
+		}
+		
+		let i = 0;
+		while (i<numAliens)
+		{
+			let a = targets[i];
+			if(a.isInside(shotX,shotY))
+			{
+				do a.die();
+				return true;
+				
+			}
+			let i = i + 1;
+		}
+		
+		return false;
+	}
+	
+	method void moveAllSide(int num)
+	{
+		var int i;
+		var Alien a;
+		let i = 0;
+		while (i<numAliens)
+		{
+			let a = targets[i];
+			do a.moveSide(num);
+			let i = i + 1;
+		}
+		return;
+	}
+
+
+}

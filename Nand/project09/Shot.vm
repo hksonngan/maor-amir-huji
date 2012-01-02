@@ -1,0 +1,85 @@
+function Shot.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop this 1
+push pointer 0
+return
+function Shot.shoot 0
+push argument 0
+pop pointer 0
+push this 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push constant 0
+not
+pop this 1
+push argument 1
+push argument 2
+push constant 2
+call Math.divide 2
+add
+push constant 2
+sub
+push constant 1
+add
+push constant 256
+push argument 2
+sub
+push constant 4
+sub
+push constant 2
+call Square.new 3
+pop this 0
+push constant 0
+return
+function Shot.resumeShot 1
+push argument 0
+pop pointer 0
+push this 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 0
+call Square.getY 1
+pop local 0
+push this 0
+push constant 1
+call Square.moveUp 2
+pop temp 0
+push argument 1
+push this 0
+call Square.getX 1
+push this 0
+call Square.getY 1
+call Aliens.shot 3
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+pop this 1
+push this 0
+call Square.erase 1
+pop temp 0
+label IF_FALSE1
+push local 0
+push this 0
+call Square.getY 1
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 0
+pop this 1
+push this 0
+call Square.erase 1
+pop temp 0
+label IF_FALSE2
+label IF_FALSE0
+push constant 0
+return
