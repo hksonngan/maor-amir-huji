@@ -1,0 +1,217 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/09/Square/SquareGame.jack
+
+/**
+ * The SquareDance class implements the Square Dance game.
+ * In this game you can move a black square around the screen and
+ * change its size during the movement.
+ * In the beggining, the square is located at the top left corner.
+ * Use the arrow keys to move the square.
+ * Use 'z' & 'x' to decrement & increment the size.
+ * Use 'q' to quit.
+ */
+class SquareGame {
+
+    // The square
+    field Square square;
+	field int counter;
+	field int secCounter;
+	field Aliens aa;
+    // The square's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    /** Constructs a new Square Game. */
+    constructor SquareGame new() {
+        let square = Square.new(256-20, 256 - 31, 30);
+        let direction = 0;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do square.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Starts the game. Handles inputs from the user that controls
+     *  the square movement direction and size. */
+    method void run() {
+        var char key;
+        var boolean exit;
+		var Shot sh; 
+		//var Alien al;
+		//var Aliens aa;
+		
+		
+		//let al = Alien.new(250,20);
+		//do al.raiseAlien();
+		let sh = Shot.new();
+        let exit = false;
+		
+		
+		let aa = Aliens.new();
+		//do aa.allAlive();
+		
+		let counter = 0;
+		let secCounter = 0;
+		
+		do SquareGame.drawGrid();
+        while (~exit) {
+            // waits for a key to be pressed.
+			do sh.resumeShot(aa);
+            while (key = 0) {
+                let key = Keyboard.keyPressed();
+				do sh.resumeShot(aa);
+				//do advance();
+				// do Output.printInt(direction);
+                //do moveSquare();
+            }
+			let direction = 0;
+            if (key = 81) {
+                let exit = true;
+				
+            }
+            if (key = 90) {
+                // do square.decSize();
+				do sh.shoot(square.getX(),square.getSize());
+            }
+            if (key = 88) {
+                do square.incSize();
+            }
+			/*
+            if (key = 131) {
+                let direction = 1;
+				// do Output.printInt(1);
+				
+            }
+            if (key = 133) {
+                let direction = 2;
+				// do Output.printInt(2);
+            }
+			*/
+            if (key = 130) {
+                let direction = 3;
+				// do Output.printInt(3);
+            }
+            if (key = 132) {
+				
+                let direction = 4;
+				// do Output.printInt(4);
+            }
+			
+            // waits for the key to be released.
+            while (~(key = 0)) {
+                let key = Keyboard.keyPressed();
+				
+				if ( (direction = 1) | (direction = 2) | (direction = 3) | (direction = 4))
+				{
+					 do moveSquare();
+				}
+				do sh.resumeShot(aa);
+				//do advance();
+            }
+        }
+            
+        return;
+	}
+
+    /** Moves the square by 2 in the current direction. */
+    method void moveSquare() {
+        if (direction = 1) {
+            do square.moveUp(2);
+        }
+        if (direction = 2) {
+            do square.moveDown();
+        }
+        if (direction = 3) {
+            do square.moveLeft(1);
+        }
+        if (direction = 4) {
+            do square.moveRight(1);
+        }
+
+        do Sys.wait(5); // Delays the next movement.
+        return;
+    }
+	
+	method void advance()
+	{
+		if ( secCounter = 700)
+		{
+			let secCounter = 0;
+			
+		}
+		else
+		{
+			let secCounter = secCounter +1;
+			return;
+		}
+		if (counter = 10)
+		{
+			let counter = 0;
+		}
+		
+		if ( counter < 3)
+		{
+			do aa.moveAllSide(10);
+		}
+		else
+		{
+			if(counter < 6)
+			{
+				do aa.moveAllSide(-20);
+			}
+			else
+			{
+				if (counter <9)
+				{
+					do aa.moveAllSide(10);
+				}
+			}
+		}
+		do Output.printString("WTF");
+		do Output.println();
+		let counter = counter +1;
+		return;
+		
+	}
+	
+	
+	function void drawGrid()
+	{
+		var int y_offset;
+		var int x_offset;
+		var int i;
+		let i = 0;
+		let y_offset = 50;
+		let x_offset = 256;
+		
+		while(i<9)
+		{
+			do Screen.drawLine(256, ((i*20) + y_offset), 466 ,  (i*20) + y_offset);
+			let i = i + 1;
+			
+		}
+		
+		do Output.printString("ver");
+		do Output.println();
+		let i =0;
+		//do Screen.drawLine(255,2,500,255);
+		
+		while(i<9)
+		{
+			do Screen.drawLine(( x_offset + (i*25)) , y_offset ,(x_offset+(i*25)) , 155 + y_offset);
+			let i = i + 1;
+		}
+		
+		return;
+	}
+	
+	
+}
+
+

@@ -1,0 +1,102 @@
+class Alien{
+
+	static int r;
+	field int x,y;
+	field boolean isAlive;
+	
+	constructor Alien new(int newX, int newY) {
+			let x = newX;
+			let y = newY;
+			let r = 12; // should be in upper class
+			let isAlive = false;
+			return this;
+		}
+	
+	method boolean isInside(int isX, int isY)
+	{
+		var int isR_squared;
+		var int r_current_squared;
+		if (~isAlive)
+		{
+			return false;
+		}
+		// if ( ((((isY > (y + r)) | (isY < (y-r))) | isX < (x - r)) | isX > (x + r)))
+		if ( ((((isY >(y + r)) | (isY < (y-r))) | (isX < (x - r))) | (isX > (x + r))))
+		{
+			//do Output.printString("notEntered");
+			//do Output.println();
+			return false;
+		}
+		
+		let isR_squared = (((isX-x)*(isX-x)) + ((isY-y)*(isY-y)));
+		let r_current_squared = r*r;
+		/*
+		do Output.printString("new = ");
+		do Output.printInt(isR_squared);
+		do Output.println();
+		do Output.printInt(r_current_squared);
+		do Output.println();
+		*/
+		return ( (isR_squared < r_current_squared) |  (isR_squared = r_current_squared));
+	}
+	
+	method void draw()
+	{
+		do Screen.setColor(true);
+		do Screen.drawCircle(x,y,r);
+		return;
+	}
+	
+	method void erase()
+	{
+		do Screen.setColor(false);
+		do Screen.drawCircle(x,y,r);
+		return;
+	}
+	
+	method void die()
+	{
+		if (~isAlive)
+		{
+			return;
+		}
+		let isAlive = false;
+		do erase();
+		return;
+	}
+	
+	method void raiseAlien()
+	{
+		if (isAlive)
+		{
+			return;
+		}
+		
+		let isAlive = true;
+		do draw();
+		return;
+	}
+	
+	method int getX()
+	{
+		return x;
+	}
+	
+	method int getY()
+	{
+		return y;
+	}
+	
+	method void moveSide( int num )
+	{
+		if (~isAlive)
+		{
+			return;
+		}
+		do erase();
+		let x = x + num;
+		do draw();
+		return;
+	}
+
+}
