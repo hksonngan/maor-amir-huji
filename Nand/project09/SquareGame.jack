@@ -36,6 +36,7 @@ class SquareGame {
         do Memory.deAlloc(this);
         return;
     }
+	
 
     /** Starts the game. Handles inputs from the user that controls
      *  the square movement direction and size. */
@@ -60,6 +61,7 @@ class SquareGame {
 		let secCounter = 0;
 		
 		do SquareGame.drawGrid();
+		do SquareGame.drawCircle();
         while (~exit) {
             // waits for a key to be pressed.
 			do sh.resumeShot(aa);
@@ -187,12 +189,12 @@ class SquareGame {
 		var int x_offset;
 		var int i;
 		let i = 0;
-		let y_offset = 50;
+		let y_offset = 27;
 		let x_offset = 256;
 		
 		while(i<9)
 		{
-			do Screen.drawLine(256, ((i*20) + y_offset), 466 ,  (i*20) + y_offset);
+			do Screen.drawLine(256, ((i*28) + y_offset), 480 ,  (i*28) + y_offset);
 			let i = i + 1;
 			
 		}
@@ -204,7 +206,7 @@ class SquareGame {
 		
 		while(i<9)
 		{
-			do Screen.drawLine(( x_offset + (i*25)) , y_offset ,(x_offset+(i*25)) , 155 + y_offset);
+			do Screen.drawLine(( x_offset + (i*28)) , y_offset ,(x_offset+(i*28)) , 223 + y_offset);
 			let i = i + 1;
 		}
 		
