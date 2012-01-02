@@ -3,6 +3,7 @@ class Board
 	field Array cols;
 	field Array players_cols;
 	field boolean turn;
+	
 	constructor Board new() {
 		var int i,j;
 		var Array temp;
@@ -92,13 +93,13 @@ class Board
 		return;
 	}
 	
-	method void putPlayer(int k)
+	method boolean putPlayer(int k)
 	{
 		var Piece p;
 		var int i, exact;
 		var Array current;
 		let i =-1;
-		let p = Piece.new(turn);
+		let p = Piece.new(turn,false);
 		let current = players_cols[k];
 		while(((current[(i+1)] =0)) & (i<5))
 		{
@@ -106,7 +107,7 @@ class Board
 		}
 		if ( i = -1)
 		{
-			return;
+			return false;
 		}
 
 		let exact = i;
@@ -115,6 +116,6 @@ class Board
 		let current[exact] = p;
 		do p.drawPiece(k,exact);
 		let turn = ~turn;
-		return;
+		return true;
 	}
 }

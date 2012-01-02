@@ -14,24 +14,23 @@
  */
 class SquareGame {
 
-    // The square
-    field Square square;
 	field int counter;
 	field int secCounter;
-    // The square's movement direction
-    field int direction; // 0=none,1=up,2=down,3=left,4=right
-
-    /** Constructs a new Square Game. */
+	field int playerXPos;
+	field Piece movingPlayer;
+	field Board b;
+	
+    
+	/** Constructs a new Square Game. */
     constructor SquareGame new() {
-        let square = Square.new(256-20, 256 - 31, 30);
-        let direction = 0;
-
+		let b = Board.new();
+		let playerXPos = 6;
         return this;
     }
 
     /** Deallocates the object's memory. */
     method void dispose() {
-        do square.dispose();
+        //do square.dispose();
         do Memory.deAlloc(this);
         return;
     }
@@ -41,140 +40,78 @@ class SquareGame {
      *  the square movement direction and size. */
     method void run() {
         var char key;
-        var boolean exit;
+        var boolean exit;		
+		var Piece p;	
 		
-		var Piece p;
-
-
+		var int counter;
+		
 		
         let exit = false;
+	
 		
-
 		
 		let counter = 0;
+		
 		let secCounter = 0;
 		
 		do SquareGame.drawGrid();
-		let p = Piece.new(false);
-		do p.drawPiece(6,7);
+		do drawScoreBoard();
+		let p = Piece.new(false,false);
+		let movingPlayer = Piece.new(false,true);
+		do p.drawPiece(0,0);
+		do movingPlayer.drawPiece(playerXPos,0);
         while (~exit) {
-            // waits for a key to be pressed.
-			
-            while (key = 0) {
+            // waits for a key to be pressed.		
+           // while (key = 0) {
                 let key = Keyboard.keyPressed();
 
-
-            }
-			let direction = 0;
             if (key = 81) {
                 let exit = true;
 				
             }
-            if (key = 90) {
-                // do square.decSize();
+			if (key = 32) {
+				let counter = counter + 1;
+				if (counter = 10)
+				{
+					let counter = 0;
+					do Output.printString("SCHUNA");
+				}
+				else{
+				do Output.printString("WTF");
+				}
+				do Output.println();
+				if (b.putPlayer(playerXPos))
+				{
+					do movingPlayer.changeType();
+				}
 				
-            }
-            if (key = 88) {
-                do square.incSize();
-            }
-			/*
-            if (key = 131) {
-                let direction = 1;
-				// do Output.printInt(1);
-				
-            }
-            if (key = 133) {
-                let direction = 2;
-				// do Output.printInt(2);
-            }
-			*/
+			}
+			
+			
             if (key = 130) {
-                let direction = 3;
 				// do Output.printInt(3);
+				if (~(playerXPos = 0))
+			{
+				do movingPlayer.movePiece(playerXPos-1,0);
+				let playerXPos = playerXPos-1;
+			}
             }
             if (key = 132) {
-				
-                let direction = 4;
-				// do Output.printInt(4);
+				if (~(playerXPos = 6))
+		   {
+				do movingPlayer.movePiece(playerXPos+1,0);
+				let playerXPos = playerXPos+1;
+			}
             }
-			
-            // waits for the key to be released.
-            while (~(key = 0)) {
-                let key = Keyboard.keyPressed();
-				
-				if ( (direction = 1) | (direction = 2) | (direction = 3) | (direction = 4))
-				{
-					 do moveSquare();
-				}
-
-
-            }
+			while (~(key = 0))
+			{
+				let key = Keyboard.keyPressed();
+			}
         }
-            
+		
         return;
 	}
-
-    /** Moves the square by 2 in the current direction. */
-    method void moveSquare() {
-        if (direction = 1) {
-            do square.moveUp(2);
-        }
-        if (direction = 2) {
-            do square.moveDown();
-        }
-        if (direction = 3) {
-            do square.moveLeft(1);
-        }
-        if (direction = 4) {
-            do square.moveRight(1);
-        }
-
-        do Sys.wait(5); // Delays the next movement.
-        return;
-    }
-	/*
-	method void advance()
-	{
-		if ( secCounter = 700)
-		{
-			let secCounter = 0;
-			
-		}
-		else
-		{
-			let secCounter = secCounter +1;
-			return;
-		}
-		if (counter = 10)
-		{
-			let counter = 0;
-		}
-		
-		if ( counter < 3)
-		{
-			do aa.moveAllSide(10);
-		}
-		else
-		{
-			if(counter < 6)
-			{
-				do aa.moveAllSide(-20);
-			}
-			else
-			{
-				if (counter <9)
-				{
-					do aa.moveAllSide(10);
-				}
-			}
-		}
-		do Output.printString("WTF");
-		do Output.println();
-		let counter = counter +1;
-		return;
-		
-	}
-	*/
+	
 	
 	function void drawGrid()
 	{
@@ -183,11 +120,11 @@ class SquareGame {
 		var int i;
 		let i = 0;
 		let y_offset = 27;
-		let x_offset = 256;
+		let x_offset = 256+28;
 		
-		while(i<9)
+		while(i<7)
 		{
-			do Screen.drawLine(256, ((i*28) + y_offset), 480 ,  (i*28) + y_offset);
+			do Screen.drawLine(256+28, ((i*28) + y_offset), 480 ,  (i*28) + y_offset);
 			let i = i + 1;
 			
 		}
@@ -196,15 +133,25 @@ class SquareGame {
 		do Output.println();
 		let i =0;
 		
-		while(i<9)
+		while(i<8)
 		{
-			do Screen.drawLine(( x_offset + (i*28)) , y_offset ,(x_offset+(i*28)) , 223 + y_offset);
+			do Screen.drawLine(( x_offset + (i*28)) , y_offset ,(x_offset+(i*28)) , 223-56 + y_offset);
 			let i = i + 1;
 		}
 		
 		return;
 	}
 	
+	method void drawScoreBoard()
+	{
+		do Output.moveCursor(2,2);
+		do Output.printString("Play our 4-in-a-row game!");
+		do Output.println();
+		
+		do Output.printString("  - - - - - - - - - - - - -");
+		
+		return;
+	}
 	
 }
 
