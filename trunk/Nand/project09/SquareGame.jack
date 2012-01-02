@@ -41,7 +41,6 @@ class SquareGame {
     method void run() {
         var char key;
         var boolean exit;		
-		var Piece p;	
 		
 		var int counter;
 		
@@ -56,9 +55,7 @@ class SquareGame {
 		
 		do SquareGame.drawGrid();
 		do drawScoreBoard();
-		let p = Piece.new(false,false);
 		let movingPlayer = Piece.new(false,true);
-		do p.drawPiece(0,0);
 		do movingPlayer.drawPiece(playerXPos,0);
         while (~exit) {
             // waits for a key to be pressed.		
