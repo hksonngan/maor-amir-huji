@@ -2,70 +2,60 @@ function SquareGame.new 0
 push constant 5
 call Memory.alloc 1
 pop pointer 0
-push constant 256
-push constant 20
-sub
-push constant 256
-push constant 31
-sub
-push constant 30
-call Square.new 3
-pop this 0
-push constant 0
+call Board.new 0
 pop this 4
+push constant 6
+pop this 2
 push pointer 0
 return
 function SquareGame.dispose 0
 push argument 0
 pop pointer 0
-push this 0
-call Square.dispose 1
-pop temp 0
 push pointer 0
 call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function SquareGame.run 3
+function SquareGame.run 4
 push argument 0
 pop pointer 0
-call Shot.new 0
-pop local 2
 push constant 0
 pop local 1
-call Aliens.new 0
-pop this 3
+push constant 0
+pop local 3
 push constant 0
 pop this 1
-push constant 0
-pop this 2
 call SquareGame.drawGrid 0
+pop temp 0
+push pointer 0
+call SquareGame.drawScoreBoard 1
+pop temp 0
+push constant 0
+push constant 0
+call Piece.new 2
+pop local 2
+push constant 0
+push constant 0
+not
+call Piece.new 2
+pop this 3
+push local 2
+push constant 0
+push constant 0
+call Piece.drawPiece 3
+pop temp 0
+push this 3
+push this 2
+push constant 0
+call Piece.drawPiece 3
 pop temp 0
 label WHILE_EXP0
 push local 1
 not
 not
 if-goto WHILE_END0
-push local 2
-push this 3
-call Shot.resumeShot 2
-pop temp 0
-label WHILE_EXP1
-push local 0
-push constant 0
-eq
-not
-if-goto WHILE_END1
 call Keyboard.keyPressed 0
 pop local 0
-push local 2
-push this 3
-call Shot.resumeShot 2
-pop temp 0
-goto WHILE_EXP1
-label WHILE_END1
-push constant 0
-pop this 4
 push local 0
 push constant 81
 eq
@@ -77,206 +67,41 @@ not
 pop local 1
 label IF_FALSE0
 push local 0
-push constant 90
+push constant 32
 eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push local 2
-push this 0
-call Square.getX 1
-push this 0
-call Square.getSize 1
-call Shot.shoot 3
-pop temp 0
-label IF_FALSE1
-push local 0
-push constant 88
-eq
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
-push this 0
-call Square.incSize 1
-pop temp 0
-label IF_FALSE2
-push local 0
-push constant 130
-eq
-if-goto IF_TRUE3
-goto IF_FALSE3
-label IF_TRUE3
-push constant 3
-pop this 4
-label IF_FALSE3
-push local 0
-push constant 132
-eq
-if-goto IF_TRUE4
-goto IF_FALSE4
-label IF_TRUE4
-push constant 4
-pop this 4
-label IF_FALSE4
-label WHILE_EXP2
-push local 0
-push constant 0
-eq
-not
-not
-if-goto WHILE_END2
-call Keyboard.keyPressed 0
-pop local 0
-push this 4
-push constant 1
-eq
-push this 4
-push constant 2
-eq
-or
-push this 4
-push constant 3
-eq
-or
-push this 4
-push constant 4
-eq
-or
-if-goto IF_TRUE5
-goto IF_FALSE5
-label IF_TRUE5
-push pointer 0
-call SquareGame.moveSquare 1
-pop temp 0
-label IF_FALSE5
-push local 2
-push this 3
-call Shot.resumeShot 2
-pop temp 0
-goto WHILE_EXP2
-label WHILE_END2
-goto WHILE_EXP0
-label WHILE_END0
-push constant 0
-return
-function SquareGame.moveSquare 0
-push argument 0
-pop pointer 0
-push this 4
-push constant 1
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push this 0
-push constant 2
-call Square.moveUp 2
-pop temp 0
-label IF_FALSE0
-push this 4
-push constant 2
-eq
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push this 0
-call Square.moveDown 1
-pop temp 0
-label IF_FALSE1
-push this 4
-push constant 3
-eq
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
-push this 0
-push constant 1
-call Square.moveLeft 2
-pop temp 0
-label IF_FALSE2
-push this 4
-push constant 4
-eq
-if-goto IF_TRUE3
-goto IF_FALSE3
-label IF_TRUE3
-push this 0
-push constant 1
-call Square.moveRight 2
-pop temp 0
-label IF_FALSE3
-push constant 5
-call Sys.wait 1
-pop temp 0
-push constant 0
-return
-function SquareGame.advance 0
-push argument 0
-pop pointer 0
-push this 2
-push constant 700
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 0
-pop this 2
-goto IF_END0
-label IF_FALSE0
-push this 2
+push local 3
 push constant 1
 add
-pop this 2
-push constant 0
-return
-label IF_END0
-push this 1
+pop local 3
+push local 3
 push constant 10
 eq
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push constant 0
-pop this 1
-label IF_FALSE1
-push this 1
-push constant 3
-lt
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
-push this 3
-push constant 10
-call Aliens.moveAllSide 2
+push constant 0
+pop local 3
+push constant 6
+call String.new 1
+push constant 83
+call String.appendChar 2
+push constant 67
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 85
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+call Output.printString 1
 pop temp 0
 goto IF_END2
 label IF_FALSE2
-push this 1
-push constant 6
-lt
-if-goto IF_TRUE3
-goto IF_FALSE3
-label IF_TRUE3
-push this 3
-push constant 20
-neg
-call Aliens.moveAllSide 2
-pop temp 0
-goto IF_END3
-label IF_FALSE3
-push this 1
-push constant 9
-lt
-if-goto IF_TRUE4
-goto IF_FALSE4
-label IF_TRUE4
-push this 3
-push constant 10
-call Aliens.moveAllSide 2
-pop temp 0
-label IF_FALSE4
-label IF_END3
-label IF_END2
 push constant 3
 call String.new 1
 push constant 87
@@ -287,36 +112,113 @@ push constant 70
 call String.appendChar 2
 call Output.printString 1
 pop temp 0
+label IF_END2
 call Output.println 0
 pop temp 0
-push this 1
+push this 4
+push this 2
+call Board.putPlayer 2
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push this 3
+call Piece.changeType 1
+pop temp 0
+label IF_FALSE3
+label IF_FALSE1
+push local 0
+push constant 130
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push this 2
+push constant 0
+eq
+not
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push this 3
+push this 2
+push constant 1
+sub
+push constant 0
+call Piece.movePiece 3
+pop temp 0
+push this 2
+push constant 1
+sub
+pop this 2
+label IF_FALSE5
+label IF_FALSE4
+push local 0
+push constant 132
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push this 2
+push constant 6
+eq
+not
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push this 3
+push this 2
 push constant 1
 add
-pop this 1
+push constant 0
+call Piece.movePiece 3
+pop temp 0
+push this 2
+push constant 1
+add
+pop this 2
+label IF_FALSE7
+label IF_FALSE6
+label WHILE_EXP1
+push local 0
+push constant 0
+eq
+not
+not
+if-goto WHILE_END1
+call Keyboard.keyPressed 0
+pop local 0
+goto WHILE_EXP1
+label WHILE_END1
+goto WHILE_EXP0
+label WHILE_END0
 push constant 0
 return
 function SquareGame.drawGrid 3
 push constant 0
 pop local 2
-push constant 50
+push constant 27
 pop local 0
 push constant 256
+push constant 28
+add
 pop local 1
 label WHILE_EXP0
 push local 2
-push constant 9
+push constant 7
 lt
 not
 if-goto WHILE_END0
 push constant 256
+push constant 28
+add
 push local 2
-push constant 20
+push constant 28
 call Math.multiply 2
 push local 0
 add
-push constant 466
+push constant 480
 push local 2
-push constant 20
+push constant 28
 call Math.multiply 2
 push local 0
 add
@@ -344,22 +246,24 @@ push constant 0
 pop local 2
 label WHILE_EXP1
 push local 2
-push constant 9
+push constant 8
 lt
 not
 if-goto WHILE_END1
 push local 1
 push local 2
-push constant 25
+push constant 28
 call Math.multiply 2
 add
 push local 0
 push local 1
 push local 2
-push constant 25
+push constant 28
 call Math.multiply 2
 add
-push constant 165
+push constant 223
+push constant 56
+sub
 push local 0
 add
 call Screen.drawLine 4
@@ -370,5 +274,128 @@ add
 pop local 2
 goto WHILE_EXP1
 label WHILE_END1
+push constant 0
+return
+function SquareGame.drawScoreBoard 0
+push argument 0
+pop pointer 0
+push constant 2
+push constant 2
+call Output.moveCursor 2
+pop temp 0
+push constant 25
+call String.new 1
+push constant 80
+call String.appendChar 2
+push constant 108
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 121
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 117
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 52
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 119
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 103
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push constant 27
+call String.new 1
+push constant 32
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 45
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
 push constant 0
 return

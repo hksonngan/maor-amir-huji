@@ -1,0 +1,141 @@
+function Piece.new 0
+push constant 9
+call Memory.alloc 1
+pop pointer 0
+push constant 12
+pop this 2
+push constant 9
+pop this 3
+push constant 28
+pop this 4
+push argument 1
+pop this 8
+push constant 270
+push constant 28
+add
+pop this 5
+push argument 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 41
+push this 4
+sub
+pop this 6
+goto IF_END0
+label IF_FALSE0
+push constant 41
+pop this 6
+label IF_END0
+push argument 0
+pop this 7
+push pointer 0
+return
+function Piece.draw 0
+push argument 0
+pop pointer 0
+push this 7
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
+call Screen.drawCircle 3
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
+call Screen.drawCircle 3
+pop temp 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 3
+call Screen.drawCircle 3
+pop temp 0
+label IF_END0
+push constant 0
+return
+function Piece.erase 0
+push argument 0
+pop pointer 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
+call Screen.drawCircle 3
+pop temp 0
+push constant 0
+return
+function Piece.drawPiece 0
+push argument 0
+pop pointer 0
+push this 5
+push argument 1
+push this 4
+call Math.multiply 2
+add
+pop this 0
+push this 6
+push argument 2
+push this 4
+call Math.multiply 2
+add
+pop this 1
+push pointer 0
+call Piece.draw 1
+pop temp 0
+push constant 0
+return
+function Piece.movePiece 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Piece.erase 1
+pop temp 0
+push this 5
+push argument 1
+push this 4
+call Math.multiply 2
+add
+pop this 0
+push this 6
+push argument 2
+push this 4
+call Math.multiply 2
+add
+pop this 1
+push pointer 0
+call Piece.draw 1
+pop temp 0
+push constant 0
+return
+function Piece.changeType 0
+push argument 0
+pop pointer 0
+push this 7
+not
+pop this 7
+push pointer 0
+call Piece.erase 1
+pop temp 0
+push pointer 0
+call Piece.draw 1
+pop temp 0
+push constant 0
+return

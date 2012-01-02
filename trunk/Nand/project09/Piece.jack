@@ -2,14 +2,23 @@ class Piece
 {
 	field int x,y,r_max,r_min,jump,x_start,y_start;
 	field boolean isX;
-	constructor Piece new(boolean type)
+	field boolean isMovingPiece;
+	constructor Piece new(boolean playerType,boolean isMoving)
 	{
 		let r_max = 12;
 		let r_min = 9;
 		let jump = 28;
-		let x_start = 270;
-		let y_start = 41;
-		let isX = type;
+		let isMovingPiece = isMoving;
+		let x_start = 270+28;
+		if (isMoving)
+		{
+			let y_start = 41-jump;
+		}
+		else
+		{
+			let y_start = 41;
+		}
+		let isX = playerType;
 		return this;
 	}
 	
@@ -51,6 +60,14 @@ class Piece
 		do erase();
 		let x = x_start + (i*jump);
 		let y = y_start + (j*jump);
+		do draw();
+		return;
+	}
+	
+	method void changeType()
+	{
+		let isX = ~isX;
+		do erase();
 		do draw();
 		return;
 	}
