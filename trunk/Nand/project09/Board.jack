@@ -151,12 +151,12 @@ class Board
 		{
 			return false;
 		}
-		while ((k<(i+5)) & (win=_col[j]))
+		while ((k<(i+4)) & (win=_col[j]))
 		{
 			let _col = players_cols[k];
 			let k = k+1;
 		}
-		if (k=(i+5))
+		if ((k=(i+4)) & (win=_col[j]))
 		{
 			let current_winner = win;
 			return true;
