@@ -4,11 +4,13 @@ class Board
 	field Array players_cols;
 	field boolean turn;
 	field int current_winner;
+	
 	constructor Board new() {
 		var int i,j;
 		var Array temp;
 		let i =0;
 		let current_winner = 0;
+		let turn=false;
 		let cols = Array.new(7);
 		while (i<7)
 		{

@@ -1,8 +1,19 @@
+/**
+ * A class representing a piece in the game. A piece can
+ * be the moving piece up the board or a piece that is placed 
+ * inside the board
+ */
 class Piece
 {
 	field int x,y,r_max,r_min,jump,x_start,y_start;
 	field boolean isX;
 	field boolean isMovingPiece;
+	
+	/**
+	 * Constructor.
+	 * playerType - the type of player to draw(black of white)
+	 * isMoving   - indicates whether the piece is a moving or regular piece
+	 */
 	constructor Piece new(boolean playerType,boolean isMoving)
 	{
 		let r_max = 12;
@@ -22,7 +33,9 @@ class Piece
 		return this;
 	}
 	
-	
+	/**
+	 * draws the piece on screen based on x and y coordinates
+	 */
 	method void draw()
 	{
 		if (isX)
@@ -40,6 +53,9 @@ class Piece
 		return;
 	}
 	
+	/**
+	 * erasing the piece from screen
+	 */
 	method void erase()
 	{
 		do Screen.setColor(false);
@@ -47,6 +63,11 @@ class Piece
 		return;
 	}
 	
+	/**
+	 * draws a piece in the required coordinates.
+	 * i - the x coordinate in the board.
+	 * j - the y coordinate in the board.
+	 */
 	method void drawPiece(int i, int j)
 	{
 		let x = x_start + (i*jump);
@@ -55,6 +76,11 @@ class Piece
 		return;
 	}
 	
+	/**
+	 * Move the piece to the required coordinates 
+	 * i - the x coordinate in the board.
+	 * j - the y coordinate in the board.
+	 */
 	method void movePiece(int i, int j)
 	{
 		do erase();
@@ -64,6 +90,9 @@ class Piece
 		return;
 	}
 	
+	/**
+	 * changes the type of piece (black or white)
+	 */
 	method void changeType()
 	{
 		let isX = ~isX;
@@ -72,10 +101,12 @@ class Piece
 		return;
 	}
 	
+	/**
+	 * dispose method
+	 */
 	method void dispose()
 	{
 		do Memory.deAlloc(this);
 		return;
 	}
-	
 }
