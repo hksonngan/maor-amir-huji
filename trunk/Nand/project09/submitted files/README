@@ -1,0 +1,26 @@
+amirlaz, maord
+===============================================================================
+Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
+Maor Dayan, ID 300564770, maor.dayan@mail.huji.ac.il
+===============================================================================
+
+                           Project 9: High Level Programming
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README              
+Main.jack - the Main class of the game
+Board.jack  - represents a board in the 4-in-a-row game
+Piece.jack  - represents a piece in the game
+Game.jack - class represents the game.
+
+
+
+Remarks
+-------
+* We decided to implement a 4-in-a-row game. The game is a game of
+  two players, the white and the black players. In order to choose 
+  the column where to put the piece use the arrow keys(left and right).
+  In order to release the piece in the column press the space key.

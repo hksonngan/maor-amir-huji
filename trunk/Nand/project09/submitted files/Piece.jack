@@ -1,0 +1,112 @@
+/**
+ * A class representing a piece in the game. A piece can
+ * be the moving piece up the board or a piece that is placed 
+ * inside the board
+ */
+class Piece
+{
+	field int x,y,r_max,r_min,jump,x_start,y_start;
+	field boolean isX;
+	field boolean isMovingPiece;
+	
+	/**
+	 * Constructor.
+	 * playerType - the type of player to draw(black of white)
+	 * isMoving   - indicates whether the piece is a moving or regular piece
+	 */
+	constructor Piece new(boolean playerType,boolean isMoving)
+	{
+		let r_max = 12;
+		let r_min = 9;
+		let jump = 28;
+		let isMovingPiece = isMoving;
+		let x_start = 270+28;
+		if (isMoving)
+		{
+			let y_start = 41-jump;
+		}
+		else
+		{
+			let y_start = 41;
+		}
+		let isX = playerType;
+		return this;
+	}
+	
+	/**
+	 * draws the piece on screen based on x and y coordinates
+	 */
+	method void draw()
+	{
+		if (isX)
+		{
+			do Screen.setColor(true);
+			do Screen.drawCircle(x,y,r_max);
+		}
+		else
+		{
+			do Screen.setColor(true);
+			do Screen.drawCircle(x,y,r_max);
+			do Screen.setColor(false);
+			do Screen.drawCircle(x,y,r_min);
+		}
+		return;
+	}
+	
+	/**
+	 * erasing the piece from screen
+	 */
+	method void erase()
+	{
+		do Screen.setColor(false);
+		do Screen.drawCircle(x,y,r_max);
+		return;
+	}
+	
+	/**
+	 * draws a piece in the required coordinates.
+	 * i - the x coordinate in the board.
+	 * j - the y coordinate in the board.
+	 */
+	method void drawPiece(int i, int j)
+	{
+		let x = x_start + (i*jump);
+		let y = y_start + (j*jump);
+		do draw();
+		return;
+	}
+	
+	/**
+	 * Move the piece to the required coordinates 
+	 * i - the x coordinate in the board.
+	 * j - the y coordinate in the board.
+	 */
+	method void movePiece(int i, int j)
+	{
+		do erase();
+		let x = x_start + (i*jump);
+		let y = y_start + (j*jump);
+		do draw();
+		return;
+	}
+	
+	/**
+	 * changes the type of piece (black or white)
+	 */
+	method void changeType()
+	{
+		let isX = ~isX;
+		do erase();
+		do draw();
+		return;
+	}
+	
+	/**
+	 * dispose method
+	 */
+	method void dispose()
+	{
+		do Memory.deAlloc(this);
+		return;
+	}
+}
