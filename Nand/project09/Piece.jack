@@ -72,4 +72,10 @@ class Piece
 		return;
 	}
 	
+	method void dispose()
+	{
+		do Memory.deAlloc(this);
+		return;
+	}
+	
 }
