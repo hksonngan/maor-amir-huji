@@ -1,0 +1,26 @@
+amirlaz, maord
+===============================================================================
+Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
+Maor Dayan, ID 300564770, maor.dayan@mail.huji.ac.il
+===============================================================================
+
+                           Project 8: The VM: Program Control
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README
+Makefile              
+VMtranslator - script to run the command with java.
+CommandType.java - enum for saving a command type(C_XXX).
+Parser.java  - the Parser class
+CodeWriter.java - the CodeWriter class.
+VMtranslator.java - the main program.
+
+
+
+Remarks
+-------
+* The program was written in java and was designed as it was
+  proposed in the project description.
