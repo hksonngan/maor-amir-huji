@@ -3,11 +3,12 @@ class Board
 	field Array cols;
 	field Array players_cols;
 	field boolean turn;
-	
+	field int current_winner;
 	constructor Board new() {
 		var int i,j;
 		var Array temp;
 		let i =0;
+		let current_winner = 0;
 		let cols = Array.new(7);
 		while (i<7)
 		{
@@ -15,9 +16,7 @@ class Board
 			let cols[i] = temp;
 			let i = i +1;
 		}
-		do Output.println();
-		do Output.printString("schuna");
-		do Output.println();
+
 		let players_cols = Array.new(7);
 		let i =0;
 		let j =0;
@@ -33,8 +32,7 @@ class Board
 			let players_cols[i] = temp;
 			let i = i +1;
 		}
-		do Output.printString("schuna");
-		do Output.println();
+
 		return this;
 	}
 	
@@ -118,4 +116,245 @@ class Board
 		let turn = ~turn;
 		return true;
 	}
+	
+	method boolean connectedCol(Array arr, int start)
+	{
+		var int i,win;
+		let i =start +1;
+		let win = arr[start];
+		if (win = 0)
+		{
+			return false;
+		}
+		while(i<(start+4))
+		{
+			if (~(arr[i]=win))
+			{
+				return false;
+			}
+			let i = i +1;
+		}
+		let current_winner = win;
+		return true;
+	}
+	
+	method boolean connectedRow(int j,int i)
+	{
+		var Array _col;
+		var int k,win;
+		let k=i+1;
+		let _col = players_cols[i];
+		let win = _col[j];
+		if (win =0)
+		{
+			return false;
+		}
+		while ((k<(i+5)) & (win=_col[j]))
+		{
+			let _col = players_cols[k];
+			let k = k+1;
+		}
+		if (k=(i+5))
+		{
+			let current_winner = win;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	method void checkDiagonal(int i, int j, Array r)
+	{
+		var Array _col;
+		var int k,win;
+		var boolean loop;
+		let _col = players_cols[i];
+		let win = _col[j];
+		let loop = true;
+		if (win =0)
+		{
+			return;
+		}
+		let k=1;
+
+		//down to up
+		if ((i-2)>0)
+		{
+			while((k<4) & loop)
+			{
+				let _col = players_cols[(i-k)];
+				if ((win = _col[(j+k)]))
+				{
+					let loop =  true;
+				}
+				else
+				{
+					let loop=false;
+				}
+				
+				let k = k +1;
+			}
+			if ((k=4)&loop)
+			{
+				let current_winner = win;
+				let r[0] = i;
+				let r[1] = j;
+				let r[2] = i-3;
+				let r[3] = j+3;
+				return;
+			}
+		}
+		let k=1;
+		let loop = true;
+		let _col = players_cols[i];
+		let win = _col[j];
+		if ((i+3)<7)
+		{
+			while((k<4) & loop)
+			{
+				let _col = players_cols[(i+k)];
+				if ((win = _col[(j+k)]))
+				{
+					let loop =  true;
+				}
+				else
+				{
+					let loop=false;
+				}
+
+				let k = k +1;
+			}
+			if ((k=4) & loop)
+			{
+				let current_winner = win;
+				let r[0] = i;
+				let r[1] = j;
+				let r[2] = i+3;
+				let r[3] = j+3;
+				return;
+			}
+		}
+		return;
+	}
+	
+	method boolean getWinner()
+	{
+		if (current_winner=1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	method Array checkScore()
+	{
+		var int i,j;
+		var Array res;
+		
+		let res = Array.new(4);
+		let res[0]=-1;
+		let res[1]=-1;
+		let res[2]=-1;
+		let res[3]=-1;
+		
+		let i =0;
+		let j=0;
+
+		// checking cols
+		/*
+		while(i<7)
+		{
+			while (j<3)
+			{
+				
+				if (connectedCol(players_cols[i],j))
+				{
+					let res[0] = i;
+					let res[1] = j;
+					let res[2] = i;
+					let res[3] = j+3;
+					return res;
+				}
+				let j = j + 1;
+			}
+			let j =0;
+			let i = i + 1;
+		}
+		*/
+		let j =0;
+		let i =0;
+		//checking rows
+		while (j<7)
+		{
+			while(i<4)
+			{
+				if (i<3)
+				{
+					do checkDiagonal(j,i,res);
+					if (res[0]>0)
+					{
+						return res;
+					}
+					if (connectedCol(players_cols[j],i))
+					{
+						let res[0] = j;
+						let res[1] = i;
+						let res[2] = j;
+						let res[3] = i+3;
+						return res;
+					}
+				}
+				if (connectedRow(j,i))
+				{
+					let res[0] = i;
+					let res[1] = j;
+					let res[2] = i+3;
+					let res[3] = j;
+					return res;
+				}
+				let i = i +1;
+			}
+			let i=0;
+			let j = j+1;
+		}
+		
+		
+		
+		return res;
+	}
+	
+	method void dispose()
+	{
+		var int i,j;
+		var Array temp;
+		var Piece p;
+		let i = 0;
+		let j = 0;
+		while (i<7)
+		{
+			let temp = players_cols[i];
+			do temp.dispose();
+			let temp = cols[i];
+			/*
+			while (j<6)
+			{
+				let p = temp[j];
+				do p.dispose();
+				let j = j +1;
+			}
+			let j = 0;
+			*/
+			do temp.dispose();
+			let i = i + 1;
+		}
+		do players_cols.dispose();
+		do cols.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+	
 }

@@ -29,8 +29,10 @@ class SquareGame {
     }
 
     /** Deallocates the object's memory. */
+	// updated
     method void dispose() {
-        //do square.dispose();
+        do b.dispose();
+		do movingPlayer.dispose();
         do Memory.deAlloc(this);
         return;
     }
@@ -40,8 +42,8 @@ class SquareGame {
      *  the square movement direction and size. */
     method void run() {
         var char key;
-        var boolean exit;		
-		
+        var boolean exit,foundWinner;		
+		var Array res;
 		var int counter;
 		
 		
@@ -68,18 +70,38 @@ class SquareGame {
             }
 			if (key = 32) {
 				let counter = counter + 1;
+				/*
 				if (counter = 10)
 				{
 					let counter = 0;
 					do Output.printString("SCHUNA");
 				}
+				
 				else{
-				do Output.printString("WTF");
+				//do Output.printString("WTF");
 				}
 				do Output.println();
+				*/
 				if (b.putPlayer(playerXPos))
 				{
 					do movingPlayer.changeType();
+					let res = b.checkScore();
+					if (~(res[0]<0))
+					{
+						let foundWinner = b.getWinner();
+
+						do SquareGame.winLine(res,foundWinner);
+						if (foundWinner)
+						{
+							do Output.printString("Black Won!");
+						}
+						else
+						{
+							do Output.printString("White Won!");
+						}
+						let exit = true;
+					}
+					do res.dispose();
 				}
 				
 			}
@@ -126,8 +148,6 @@ class SquareGame {
 			
 		}
 		
-		do Output.printString("ver");
-		do Output.println();
 		let i =0;
 		
 		while(i<8)
@@ -146,9 +166,21 @@ class SquareGame {
 		do Output.println();
 		
 		do Output.printString("  - - - - - - - - - - - - -");
+		do Output.println();
+		return;
+	}
+	
+	function void winLine( Array res, boolean winner)
+	{
+		do Screen.setColor(~winner);
+		//do Screen.setColor(true);
+		do Screen.drawLine((298+(res[0]*28))-1,(41+(res[1]*28))-1,(298+(res[2]*28))-1,(41+(res[3]*28))-1);
+		do Screen.drawLine((298+(res[0]*28))+1,(41+(res[1]*28))+1,(298+(res[2]*28))+1,(41+(res[3]*28))+1);
 		
 		return;
 	}
+	
+	
 	
 }
 
