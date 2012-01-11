@@ -17,7 +17,10 @@ void main(){
 	eyeVector = normalize(-vertexVector);
 
 	//calculating light vector (L)
-	lightVector = normalize(vec3(gl_LightSource[0].position.xyz - vertexVector));
+	if(gl_LightSource[0].position[3]==0.0) //directional light
+          lightVector = normalize(vec3(gl_LightSource[0].position) ); 
+     else lightVector = normalize(vec3(gl_LightSource[0].position) - vertexVector ); //point light
+       
 
 	
 	/* compute the cos of the angle between the normal and lights direction. 

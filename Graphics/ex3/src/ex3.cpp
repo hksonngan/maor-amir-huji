@@ -9,17 +9,6 @@
 //////////////////////////////
 // Project includes         //
 //////////////////////////////
-
-#include <iostream>
-#include <stdio.h>
-#include "GLee.h"
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-
-#include "circle.h"
-#include "arcBall.h"
 #include "ex3.h"
 
 //display
@@ -103,7 +92,7 @@ GLuint   cell_fragment_shader; // a handler to fragment shader of the cell shadi
 GLuint   procedural_program_object;
 GLuint   procedural_vertex_shader;   // a handler to vertex shader of the procedural shading ('3')
 GLuint   procedural_fragment_shader; // a handler to fragment shader of the procedural shading ('3')
-
+GLint    objRadiusInShader;          // a handler to the uniform variable in the shader saves the object radius
 ///////////////////////////// TO DELETE ////////////////////////////////////////////////////
 GLuint   blinn_phong_program_object;  // a handler to the GLSL program used to update
 GLuint   blinn_phong_vertex_shader;   // a handler to vertex shader of the blinn-phong shading ('5')
@@ -710,12 +699,14 @@ void keyboard(unsigned char key, int x, int y)
 	case 'L':
 	case 'l':
 	{
-		if (!runWithShaders){
+		//if (!runWithShaders){
 		if (drawType){
 		lightType = (lightType+1) % 3;
-		if (lightType == 1) spotAngle = INITIAL_SPOT_ANGLE;
+		if (lightType == 1) 
+			if (!runWithShaders) spotAngle = INITIAL_SPOT_ANGLE;
+			else lightType = 2; //skip spot light in case of shaders
 		}
-		}
+		//}
 		break;
 	}
 
@@ -745,7 +736,7 @@ void keyboard(unsigned char key, int x, int y)
 	case '1':{
 		drawType = true;
 		runWithShaders = true;
-		lightType = 2;
+		//lightType = 2;
 		lastShaderRun = &phong_program_object;
 		glUseProgram(phong_program_object);
 		break;
@@ -754,16 +745,18 @@ void keyboard(unsigned char key, int x, int y)
 		drawType = true;
 		runWithShaders = true;
 		lastShaderRun = &cell_program_object;
-		lightType = 2;
+		//lightType = 2;
 		glUseProgram(cell_program_object);
 		break;
 		}
 	case '3':{
 		drawType = true;
-		runWithShaders = true;
-		lightType = 2;
+		runWithShaders = true;	
+		//lightType = 2;
 		lastShaderRun = &procedural_program_object;
 		glUseProgram(procedural_program_object);
+		objRadiusInShader = glGetUniformLocation(procedural_program_object, "objRadius");
+        glUniform1f(objRadiusInShader, objRadius);
 		break;
 		}
 	 ///////////////////////////// TO DELETE /////////////////////////
