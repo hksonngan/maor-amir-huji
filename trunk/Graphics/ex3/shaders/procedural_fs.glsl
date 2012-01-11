@@ -1,6 +1,8 @@
 varying vec3 normal;
 varying vec4 vertex;
 
+uniform float objRadius;
+
 void main(){
 
 	vec4 diffuse,specular;
@@ -15,7 +17,7 @@ void main(){
 	
 
 	/* set the checkerboard colors */
-	if (mod(floor(30.0*vertex.x) + floor(30.0*vertex.y) + floor(vertex.z),2.0) < 1.0)
+	if (mod(floor(4.0*vertex.x/objRadius) + floor(4.0*vertex.y/objRadius) + floor(2.0*vertex.z/objRadius),2.0) < 1.0)
 	{
 //		fragColor = colors[1];
 		diffuse = vec4(0.0,0.0,0.0,1.0);
@@ -40,7 +42,9 @@ void main(){
 	eyeVector = normalize(-vertexVector);
 
 	//calculating light vector (L)
-	lightVector = normalize(vec3(gl_LightSource[0].position.xyz - vertexVector));
+	if(gl_LightSource[0].position[3]==0.0) //directional light
+          lightVector = normalize(vec3(gl_LightSource[0].position) ); 
+     else lightVector = normalize(vec3(gl_LightSource[0].position) - vertexVector ); //point light
 
 	/* compute the cos of the angle between the normal and lights direction. 
     The light is directional so the direction is constant for every vertex.

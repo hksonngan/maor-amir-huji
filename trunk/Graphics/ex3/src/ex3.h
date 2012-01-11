@@ -15,27 +15,25 @@
 //////////////////////////////
 // Project Includes         //
 //////////////////////////////
-
+#include "GLee.h"
+#include <iostream>
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
 using namespace std;
 
+#include "circle.h"
+#include "arcBall.h"
+
+#include "openMeshIncludes.h"
+
 //////////////////////////////
 // GL Includes              //
 //////////////////////////////
 
+#include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
-
-
-//////////////////////////////
-// OpenMesh Includes        //
-//////////////////////////////
-
-#include "OpenMesh/Core/IO/MeshIO.hh"
-#include "OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh"
 
 
 //////////////////////////////
@@ -90,15 +88,7 @@ using namespace std;
 
 
 
-//////////////////////////////
-// Type Definitions         //
-//////////////////////////////
 
-// Mesh object  //
-typedef OpenMesh::PolyMesh_ArrayKernelT<> Mesh;
-
-// Vector of 3 floats  //
-typedef OpenMesh::VectorT<float, 3> Vector3F;
 
 
 //////////////////////////////
@@ -151,15 +141,7 @@ char *LoadShaderText(const char *fileName);
 void shadersInit(void);
 
 
-/////////////////////////////
-// OpenMesh usage examples //
-/////////////////////////////
-void faceCenter(Mesh & mesh);
-void computeCenterAndBoundingBox(Mesh& mesh);
-void faceValenceCounter(Mesh& mesh);
-void edgesLengths(Mesh& mesh);
-void faceCenter(Mesh & mesh);
-void vectorDemo();
+
 
 #endif
 

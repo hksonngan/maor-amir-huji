@@ -15,7 +15,9 @@ void main(){
 	//normalizing the half vector (after interpulation)
 	//normalizeHalfVector = normalize(halfVector);
 
-	lightVector = normalize(vec3(gl_LightSource[0].position.xyz - vertexVector));
+	if(gl_LightSource[0].position[3]==0.0) //directional light
+          lightVector = normalize(vec3(gl_LightSource[0].position) ); 
+     else lightVector = normalize(vec3(gl_LightSource[0].position) - vertexVector ); //point light
 
 	viewVector = normalize(-vertexVector);
 	normalizeHalfVector = normalize(lightVector + viewVector);
