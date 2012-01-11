@@ -1,9 +1,6 @@
 
 varying vec3 normal;
 
-uniform
-
-
 void main(){
 	
 	float normLightDot;

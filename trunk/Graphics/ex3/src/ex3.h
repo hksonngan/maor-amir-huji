@@ -15,18 +15,16 @@
 //////////////////////////////
 // Project Includes         //
 //////////////////////////////
-#include "GLee.h"
+
 #include <iostream>
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
 using namespace std;
 
-#include "circle.h"
-#include "arcBall.h"
 
 #include "openMeshIncludes.h"
-
+#include "GLee.h"
 //////////////////////////////
 // GL Includes              //
 //////////////////////////////
@@ -35,7 +33,8 @@ using namespace std;
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-
+#include "circle.h"
+#include "arcBall.h"
 //////////////////////////////
 // Defines                  //
 //////////////////////////////
