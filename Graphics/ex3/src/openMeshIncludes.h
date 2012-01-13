@@ -27,5 +27,9 @@ void computeCenterAndBoundingBox(Mesh& mesh);
 //void faceCenter(Mesh & mesh);
 //void vectorDemo();
 
+Mesh* subDivitionWithCutmullClark(Mesh* mesh);
+
+
+
 
 #endif
