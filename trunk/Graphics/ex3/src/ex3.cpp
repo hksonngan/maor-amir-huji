@@ -50,7 +50,7 @@ GLfloat currentTransform[16];
 
 
 //Mesh objects
-Mesh mesh;
+Mesh* mesh;
 Mesh::Point lowerLeft(0,0,0);
 Mesh::Point upperRight(0,0,0);
 Mesh::Point center;
@@ -132,6 +132,7 @@ char *LoadShaderText(const char *fileName)
     char *shaderText = NULL;
     GLint shaderLength = 0;
     FILE *fp;
+    size_t readNum;
 
     fp = fopen(fileName, "r");
     if (fp != NULL)
@@ -144,7 +145,9 @@ char *LoadShaderText(const char *fileName)
         shaderText = (GLchar *)malloc(shaderLength+1);
         if (shaderText != NULL)
         {
-            fread(shaderText, 1, shaderLength, fp);
+            readNum = fread(shaderText, 1, shaderLength, fp);
+            if (readNum == 0)
+            	return shaderText;
         }
         shaderText[shaderLength] = '\0';
         fclose(fp);
@@ -153,7 +156,7 @@ char *LoadShaderText(const char *fileName)
     return shaderText;
 }
 
-void setupShaders(GLuint* program_object,GLuint* vertex_shader,GLuint* fragment_shader,char* vshader_name,char* fshader_name)
+void setupShaders(GLuint* program_object,GLuint* vertex_shader,GLuint* fragment_shader,const char* vshader_name,const char* fshader_name)
 {
 	
 	*program_object = glCreateProgram();    // creating a program object
@@ -196,7 +199,7 @@ void setupShaders(GLuint* program_object,GLuint* vertex_shader,GLuint* fragment_
    glGetObjectParameterivARB(*program_object, GL_OBJECT_LINK_STATUS_ARB, &prog_link_success);
    if (!prog_link_success) {
      fprintf(stderr, "The shaders could not be linked\n");
-      exit(1);
+     exit(1);
    }
    
 	return ;
@@ -212,7 +215,6 @@ void shadersInit(void)
 	setupShaders(&phong_program_object,&phong_vertex_shader,&phong_fragment_shader,PHONG_VS,PHONG_FS);
 	setupShaders(&cell_program_object,&cell_vertex_shader,&cell_fragment_shader,CELL_VS,CELL_FS);
 	setupShaders(&procedural_program_object,&procedural_vertex_shader,&procedural_fragment_shader,PROCEDURAL_VS,PROCEDURAL_FS);
-	
 	
 	////////////////////////////////////////////////////////// TO DELETE ///////////////////////////////////////////////////////////
 	setupShaders(&blinn_phong_program_object,&blinn_phong_vertex_shader,&blinn_phong_fragment_shader,BLINN_PHONG_VS,BLINN_PHONG_FS);
@@ -304,6 +306,9 @@ void computeObjectInitScale()
 // checking
 int main(int argc, char * argv[])
 {
+
+
+
 	// check correct usage  //
 	if (argc != ARGUMENTS_REQUIRED)
 	{
@@ -322,6 +327,9 @@ int main(int argc, char * argv[])
 	circle = new Circle(circle_radius,GREEN);
 	arcBall = new ArcBall();
 
+	// Initialize Mesh
+	mesh = new Mesh();
+
 	// Initialize openGL  //
 	initGL();
 
@@ -332,8 +340,14 @@ int main(int argc, char * argv[])
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 
+
+
+
+
+
+
 	// try to load the mesh from the given input file //
-	if (!OpenMesh::IO::read_mesh(mesh, argv[ARGUMENTS_INPUTFILE]))
+	if (!OpenMesh::IO::read_mesh(*mesh, argv[ARGUMENTS_INPUTFILE]))
 	{
 		// if we didn't make it, exit...  //
 		fprintf(stderr, "Error loading mesh, Aborting.\n");
@@ -346,7 +360,7 @@ int main(int argc, char * argv[])
 	initialMatrix(currentTransform);
 
 
-	computeCenterAndBoundingBox(mesh);
+	computeCenterAndBoundingBox(*mesh);
 
 	// calculate new objRadius and objDepth
 	computeObjectInitScale();
@@ -431,7 +445,7 @@ void addModelToScene(){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		drawModel(mesh);
+		drawModel(*mesh);
 	}
 	else{ //case of wireframe model to be drawn
 		glDisable(GL_LIGHTING);
@@ -441,17 +455,17 @@ void addModelToScene(){
 			glEnable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glColor3f(RED);
-			drawModel(mesh);
+			drawModel(*mesh);
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0, 1.0);
 			glColor3f(BLACK);
-			drawModel(mesh);
+			drawModel(*mesh);
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			}
 		else
-			drawModel(mesh);
+			drawModel(*mesh);
 	}
 }
 
@@ -473,8 +487,8 @@ void initGL(void)
 	shadersInit();
 
 	//set initial normals
-	mesh.request_vertex_normals();
-	mesh.request_face_normals();
+	mesh->request_vertex_normals();
+	mesh->request_face_normals();
 
 	//for the random numbers generator
 	srand((unsigned)time(0));
@@ -559,7 +573,7 @@ void display(void)
 	glTranslatef(-center[0],-center[1],-center[2]);
 
 	//updating normals
-	mesh.update_normals();
+	mesh->update_normals();
 
 	//drawing the model
 	addModelToScene();
@@ -702,11 +716,22 @@ void keyboard(unsigned char key, int x, int y)
 		//if (!runWithShaders){
 		if (drawType){
 		lightType = (lightType+1) % 3;
-		if (lightType == 1) 
+		if (lightType == 1) {
 			if (!runWithShaders) spotAngle = INITIAL_SPOT_ANGLE;
 			else lightType = 2; //skip spot light in case of shaders
 		}
+		}
 		//}
+		break;
+	}
+
+	case 'S':
+	case 's':
+	{
+		//Mesh* newMesh;
+		mesh = subDivitionWithCutmullClark(mesh);
+
+
 		break;
 	}
 
