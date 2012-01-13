@@ -119,7 +119,7 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 		//cout << "vertex valence(calc): "<< vertexValence << "    . vertex valence(func): " << mesh.valence(vHandle) << endl;
 		center = Mesh::Point(0,0,0);
 		//checking if the current half-edge is a boundary edge
-		if (vertexValence <= 1){
+		if (vertexValence <= 2){
 			Mesh::VertexEdgeIter edgeIter = mesh.ve_iter(vHandle);
 			for (;edgeIter;++edgeIter){
 				heHandle = mesh.halfedge_handle(edgeIter.handle(),0);
@@ -127,38 +127,41 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 				if (tempHandle == vHandle){
 					tempHandle = mesh.from_vertex_handle(heHandle);
 				}
-				center += mesh.point(tempHandle);
+				center += mesh.point(tempHandle)*0.125;
 			}
-			center += mesh.point(vHandle)*6.0;
+			center += mesh.point(vHandle)*0.725;
 
-			center = center / 8.0;
+			//center = center / 8.0;
 		}
 		else{ //not in boundary
-			coef = 1.0/(vertexValence*vertexValence);
+			coef = 1.0/(vertexValence);
 
 			//calculating average of faces
 			Mesh::VertexFaceIter faceIter = mesh.vf_iter(vHandle);
-			int counter = 0;
 			tempPoint = Mesh::Point(0,0,0);
+			int counter = 0;
 			for (;faceIter;++faceIter){
 				fHandle = faceIter.handle();
 				tempPoint += newMesh.point(mesh.property(fp_point_handle,fHandle));
 				counter++;
 			}
-			center += tempPoint*coef;
+			center += tempPoint*coef/(float)counter;
 
 			tempPoint = Mesh::Point(0,0,0);
 
 			//calculation average of edges
 			Mesh::VertexEdgeIter edgeIter = mesh.ve_iter(vHandle);
+			counter = 0;
 			for (;edgeIter;++edgeIter){
 				eHandle = edgeIter.handle();
 				tempPoint += newMesh.point(mesh.property(ep_point_handle,eHandle));
+				counter++;
 
 			}
 			//cout << "vertex valence(calc): "<< counter << "    . vertex valence(func): " << vertexValence << endl;
-			center += tempPoint*2.0*coef;
+			center += tempPoint*2.0*coef/(float)counter;
 			//adding this vertex to the calculation
+
 			center += mesh.point(vHandle)*((float)(vertexValence-3)/vertexValence);
 		}
 		mesh.property(vp_point_handle,vHandle) = newMesh.add_vertex(center);
@@ -219,8 +222,6 @@ void addEdgePoint(Mesh& mesh,Mesh& newMesh){
 
 
 }
-
-
 
 
 void addFacePoint(Mesh& mesh,Mesh& newMesh)
