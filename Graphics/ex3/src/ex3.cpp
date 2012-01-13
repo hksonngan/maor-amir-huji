@@ -730,7 +730,7 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		//Mesh* newMesh;
 		mesh = subDivitionWithCutmullClark(mesh);
-
+		cout << "here3" << endl;
 
 		break;
 	}

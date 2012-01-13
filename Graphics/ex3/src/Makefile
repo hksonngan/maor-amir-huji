@@ -22,8 +22,11 @@ all: ex3
 GLee.o: GLee.h GLee.c
 	$(CC) $(COMP_FLAGS) $(LINK_FLAGS) -c GLee.c -o GLee.o
 
-ex3.o: catmullclark.cpp arcBall.cpp circle.cpp ex3.cpp
+ex3.o: catmullclark.cpp arcBall.cpp
 	$(CC) $(COMP_FLAGS) $(LINK_FLAGS) -c catmullclark.cpp ex3.cpp
+
+catmull.o:
+	$(CC) $(COMP_FLAGS) $(LINK_FLAGS) -c catmullclark.cpp -o catmullclark.o
 
 arcBall.o:
 	$(CC) $(COMP_FLAGS) $(LINK_FLAGS) -c arcBall.cpp -o arcBall.o
@@ -31,8 +34,8 @@ arcBall.o:
 circle.o:
 	$(CC) $(COMP_FLAGS) $(LINK_FLAGS) -c circle.cpp -o circle.o
 
-ex3: GLee.o arcBall.o circle.o ex3.o
-	$(CC) $(COMP_FLAGS) GLee.o arcBall.o circle.o ex3.o -o ex3 $(LINK_FLAGS)
+ex3: GLee.o arcBall.o circle.o catmull.o ex3.o
+	$(CC) $(COMP_FLAGS) GLee.o arcBall.o circle.o catmullclark.o ex3.o -o ex3 $(LINK_FLAGS)
 
 tar:
 	tar cvf $(EXEC).tar Makefile README $(SRCS) $(HDRS)
