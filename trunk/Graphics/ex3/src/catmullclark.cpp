@@ -15,10 +15,10 @@ OpenMesh::EPropHandleT<Mesh::VertexHandle> ep_point_handle;
 // handle for properties associated with a faces
 OpenMesh::FPropHandleT< Mesh::VertexHandle > fp_point_handle;
 // handle for properties associated with a vertex
-  OpenMesh::VPropHandleT<Mesh::VertexHandle> vp_point_handle;
+OpenMesh::VPropHandleT<Mesh::VertexHandle> vp_point_handle;
 
 
-
+//reference to the used functions in this file
 void addPropertiesToMesh(Mesh& mesh);
 void removePropertiesFromMesh(Mesh& mesh);
 void addFacePoint(Mesh& mesh,Mesh& newMesh);
@@ -27,27 +27,31 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh);
 void refineMesh(Mesh& mesh,Mesh& newMesh);
 
 
+/*
+ * given a mesh, adding all the required properties to it.
+ */
 void addPropertiesToMesh(Mesh& mesh){
-
-
-	/** adding handles to properties **/
-		mesh.add_property(ep_point_handle);
-		mesh.add_property(ep_bool_handle);
-		mesh.add_property(fp_point_handle);
-		mesh.add_property(vp_point_handle);
+	mesh.add_property(ep_point_handle);
+	mesh.add_property(ep_bool_handle);
+	mesh.add_property(fp_point_handle);
+	mesh.add_property(vp_point_handle);
 
 }
 
+/*
+ * given a mesh, removes all the added properties from it
+ */
 void removePropertiesFromMesh(Mesh& mesh){
-
 	mesh.remove_property(ep_point_handle);
 	mesh.remove_property(ep_bool_handle);
 	mesh.remove_property(fp_point_handle);
 	mesh.remove_property(vp_point_handle);
-
 }
 
-
+/*
+ * given a pointer to a mesh, subdividing this mesh using the cutmull-clark algorithm.
+ * This function deletes the old mesh, and returns a pointer to the new mesh.
+ */
 Mesh* subDivitionWithCutmullClark(Mesh* mesh){
 
 	//creating new mesh;
@@ -68,8 +72,6 @@ Mesh* subDivitionWithCutmullClark(Mesh* mesh){
 	//build new refined mesh
 	refineMesh(*mesh,*newMesh);
 
-	cout << "here1" << endl;
-
 	//remove used properties
 	removePropertiesFromMesh(*mesh);
 
@@ -77,21 +79,22 @@ Mesh* subDivitionWithCutmullClark(Mesh* mesh){
 	newMesh->request_face_normals();
 
 	//add normals to each vertex
-	mesh->request_vertex_normals();
+	newMesh->request_vertex_normals();
 
-	//this command updates both the face and the vertex normals, can use update_face_normals and then update_vertex_normals
-	mesh->update_normals();
+	//update both the face and the vertex normals
+	newMesh->update_normals();
 
-	cout << "here2" << endl;
-
-	//delete mesh;
-
+	//deleting old mesh
+	delete mesh;
 
 	return newMesh;
 }
 
+/*
+ * given a mesh and a vertex handle in the mesh, returning the
+ * number of faces sharing this vertex
+ */
 int calcVertexFaces(Mesh& mesh, Mesh::VertexHandle handle){
-	//calculating average of faces
 	Mesh::VertexFaceIter faceIter = mesh.vf_iter(handle);
 	Mesh::FaceHandle fHandle;
 	int counter = 0;
@@ -104,9 +107,12 @@ int calcVertexFaces(Mesh& mesh, Mesh::VertexHandle handle){
 
 }
 
-
-void addVertexPoint(Mesh& mesh,Mesh& newMesh)
-{
+/*
+ * given a mesh and a new mesh, calculating the new vertex point
+ * of every vertex in the old mesh, adding it to the new mesh, and setting
+ * a property of type vertexHandle in the vertex at the old mesh.
+ */
+void addVertexPoint(Mesh& mesh,Mesh& newMesh){
 
 	Mesh::VertexIter vIter = mesh.vertices_begin();
 	Mesh::VertexIter vIterEnd = mesh.vertices_end();
@@ -127,11 +133,10 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 
 		//get vertex valence
 		vertexValence = calcVertexFaces(mesh,vHandle);
-		//cout << "vertex valence(calc): "<< vertexValence << "    . vertex valence(func): " << mesh.valence(vHandle) << endl;
 		center = Mesh::Point(0,0,0);
+		int edgesCounter = 0;
 		//checking if the current half-edge is a boundary edge
-		if (vertexValence <= 2){
-			cout << "entered boundary" << endl;
+		if (mesh.is_boundary(vHandle)){
 			Mesh::VertexEdgeIter edgeIter = mesh.ve_iter(vHandle);
 			for (;edgeIter;++edgeIter){
 				heHandle = mesh.halfedge_handle(edgeIter.handle(),0);
@@ -139,11 +144,11 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 				if (tempHandle == vHandle){
 					tempHandle = mesh.from_vertex_handle(heHandle);
 				}
-				center += mesh.point(tempHandle)*0.125;
+				center += mesh.point(tempHandle);
+				edgesCounter++;
 			}
+			center = center*0.25 / edgesCounter;
 			center += mesh.point(vHandle)*0.75;
-
-			//center = center / 8.0;
 		}
 		else{ //not in boundary
 			coef = 1.0/((float)vertexValence);
@@ -157,9 +162,7 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 				tempPoint += newMesh.point(mesh.property(fp_point_handle,fHandle));
 				counter++;
 			}
-			tempPoint = tempPoint*coef;
-			tempPoint = tempPoint / (float)counter;
-			center += tempPoint;
+			center += tempPoint*coef/ (float)counter;
 
 			tempPoint = Mesh::Point(0,0,0);
 
@@ -170,70 +173,62 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh)
 				eHandle = edgeIter.handle();
 				tempPoint += newMesh.point(mesh.property(ep_point_handle,eHandle));
 				counter++;
-
 			}
-			//cout << "vertex valence(calc): "<< counter << "    . vertex valence(func): " << vertexValence << endl;
-			tempPoint = tempPoint*2.0;
-			tempPoint = tempPoint*coef;
-			tempPoint = tempPoint / (float)counter;
-			center += tempPoint;
+			center += tempPoint*2.0*coef / (float) counter;
 
 			//adding this vertex to the calculation
-			tempPoint = mesh.point(vHandle);
-			tempPoint = tempPoint*((float)vertexValence - 3.0);
-			tempPoint = tempPoint / (float)vertexValence;
-			center += tempPoint;
+			center += mesh.point(vHandle)* ((float)vertexValence - 3.0) / (float) vertexValence;
 		}
 		mesh.property(vp_point_handle,vHandle) = newMesh.add_vertex(center);
-		//cout << "current point is: " << center << endl;
 	}
 	return;
 }
 
+/*
+ * given a mesh and a new mesh, calculating the new edge point
+ * of every edge in the old mesh, adding it to the new mesh, and setting
+ * a property of type vertexHandle in the edge at the old mesh.
+ */
 void addEdgePoint(Mesh& mesh,Mesh& newMesh){
 
 	Mesh::HalfedgeIter heIter = mesh.halfedges_begin();
 	Mesh::HalfedgeIter heIterEnd = mesh.halfedges_end();
-	Mesh::HalfedgeHandle heHandle,opposite_heHandle;
+	Mesh::HalfedgeHandle heHandle;
 	Mesh::EdgeHandle eHandle;
-	Mesh::Point center;
 	Mesh::FaceHandle fHandle,ofHandle;
+	Mesh::Point center;
 
 	for (;heIter != heIterEnd;++heIter){
 
 		//get current halfEdge and its opposite
 		heHandle = heIter.handle();
-		opposite_heHandle = mesh.opposite_halfedge_handle(heHandle);
+
+		//initialize center for the current edge
+		center = Mesh::Point(0,0,0);
 
 		//get edge handle
 		eHandle = mesh.edge_handle(heHandle);
-
-		center = Mesh::Point(0,0,0);
 
 		//check if this half-edge already been calculated
 		if (mesh.property(ep_bool_handle,eHandle))
 			continue;
 
 		//adding the vertices to the calculation of point
-
 		center += mesh.point(mesh.to_vertex_handle(heHandle));
 		center += mesh.point(mesh.from_vertex_handle(heHandle));
 
 		//getting handles to faces
 		fHandle = mesh.face_handle(heHandle);
-		ofHandle = mesh.face_handle(opposite_heHandle);
+		ofHandle = mesh.face_handle(mesh.opposite_halfedge_handle(heHandle));
 
-		//checking if the current half-edge is a boundary edge
-		if (!fHandle.is_valid() || !ofHandle.is_valid()){
-			cout << "boundary edge" << endl;
+		//checking if the edge is a boundary edge
+		if (mesh.is_boundary(eHandle)){
 			center = center / 2.0 ;
 		}
 		else{
 			center +=  newMesh.point(mesh.property(fp_point_handle,fHandle));
 			center +=  newMesh.point(mesh.property(fp_point_handle,ofHandle));
 			center = center / 4.0;
-			//cout << "this face point: " << mesh.property(fp_point_handle,fHandle) << endl;
-			//cout << "opposite face point: " << mesh.property(fp_point_handle,ofHandle) << endl;
 		}
 
 		//adding center point to edge and set edge's boolean property to true
@@ -244,9 +239,12 @@ void addEdgePoint(Mesh& mesh,Mesh& newMesh){
 
 }
 
-
-void addFacePoint(Mesh& mesh,Mesh& newMesh)
-{
+/*
+ * given a mesh and a new mesh, calculating the new face point(the average of every vertex)
+ * of every face in the old mesh, adding it to the new mesh, and setting
+ * a property of type vertexHandle in the face at the old mesh.
+ */
+void addFacePoint(Mesh& mesh,Mesh& newMesh){
 
   Mesh::FaceIter fiter = mesh.faces_begin();
   Mesh::FaceIter fend = mesh.faces_end();
@@ -275,25 +273,24 @@ void addFacePoint(Mesh& mesh,Mesh& newMesh)
       //adding vertex point to face
        center = center / (double) valence;
        mesh.property(fp_point_handle,fhandle) = newMesh.add_vertex(center);
-      // cout <<"center of face "<< fhandle.idx()<<" is "<< mesh.property(fp_point_handle,fhandle)<<endl;
     }
 }
 
 
-
+/*
+ * given a mesh with new calculated edge,face and vertex point(set as properties of
+ * type vertexHandle and added to the new mesh as new vertices) building the 'newMesh'
+ * mesh from the calculated points (adding the new faces to it)
+ */
 void refineMesh(Mesh& mesh,Mesh& newMesh){
-
 
 	Mesh::FaceIter fiter = mesh.faces_begin();
 	Mesh::FaceIter fend = mesh.faces_end();
 	Mesh::FaceHandle fhandle;
 	vector<Mesh::VertexHandle> faceHandles(4);
-	//faceHandles.clear();
-	int faceCounter = 0;
-	int newFaceCounter = 0;
+
 	for (;fiter != fend;++fiter){
 		fhandle = fiter.handle();
-		faceCounter++;
 		Mesh::FaceHalfedgeIter fhIter = mesh.fh_iter(fhandle);
 		Mesh::VertexHandle vHandle,temp;
 		Mesh::HalfedgeHandle fhHandle,lastvHandle,firstvHandle;
@@ -303,74 +300,19 @@ void refineMesh(Mesh& mesh,Mesh& newMesh){
 		++fhIter;
 		for (;fhIter;++fhIter){
 			fhHandle = fhIter.handle();
-			temp = mesh.property(fp_point_handle,fhandle);
-			cout << "temp1:" << temp << "  is: " << newMesh.point(temp) << endl;
 			faceHandles[0] = mesh.property(fp_point_handle,fhandle);;
-			temp = mesh.property(ep_point_handle,mesh.edge_handle(lastvHandle));
-			cout << "temp2:" << temp << "  is: " << newMesh.point(temp) << endl;
 			faceHandles[1] = mesh.property(ep_point_handle,mesh.edge_handle(lastvHandle));
-			temp = mesh.property(vp_point_handle,vHandle);
 			faceHandles[2] = mesh.property(vp_point_handle,vHandle);
-			cout << "temp3:" << temp << "  is: " << newMesh.point(temp) << endl;
-			temp = mesh.property(ep_point_handle,mesh.edge_handle(fhHandle));
 			faceHandles[3] = mesh.property(ep_point_handle,mesh.edge_handle(fhHandle));
-			cout << "temp4:" << temp << "  is: " << newMesh.point(temp) << endl;
-		//	cout << "faceHandles:(0):" << newMesh.point(faceHandles[0]) <<", (1):" << newMesh.point(faceHandles[1])<<", (2):" << newMesh.point(faceHandles[2])<< ", (3):" << newMesh.point(faceHandles[3]) << endl;
 			newMesh.add_face(faceHandles);
-			newFaceCounter++;
 			lastvHandle = fhHandle;
 			vHandle = mesh.to_vertex_handle(lastvHandle);
 		}
-
 		//adding last quad in face
-		temp = mesh.property(fp_point_handle,fhandle);
 		faceHandles[0] = mesh.property(fp_point_handle,fhandle);
-		cout << "temp1:" << temp << "  is: " << newMesh.point(temp) << endl;
-		temp = mesh.property(ep_point_handle,mesh.edge_handle(lastvHandle));
 		faceHandles[1] = mesh.property(ep_point_handle,mesh.edge_handle(lastvHandle));
-		cout << "temp2:" << temp << "  is: " << newMesh.point(temp) << endl;
-		temp = mesh.property(vp_point_handle,vHandle);
 		faceHandles[2] = mesh.property(vp_point_handle,vHandle);
-		cout << "temp3:" << temp << "  is: " << newMesh.point(temp) << endl;
-		temp = mesh.property(ep_point_handle,mesh.edge_handle(firstvHandle));
 		faceHandles[3] = mesh.property(ep_point_handle,mesh.edge_handle(firstvHandle));
-		cout << "temp4:" << temp << "  is: " << newMesh.point(temp) << endl;
-
 		newMesh.add_face(faceHandles);
-		newFaceCounter++;
-		cout << "orig face num: " << faceCounter << " new faces: " << newFaceCounter << endl;
-
 	}
-	cout << "number of faces: " << faceCounter << endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
