@@ -6,10 +6,13 @@
  *
 \******************************************************************/
 
-//////////////////////////////
-// Project includes         //
-//////////////////////////////
+
 #include "ex3.h"
+
+
+//////////////////////////////
+// Variable declarations    //
+//////////////////////////////
 
 //display
 float fov = INITIAL_FOV;
@@ -55,6 +58,8 @@ Mesh::Point lowerLeft(0,0,0);
 Mesh::Point upperRight(0,0,0);
 Mesh::Point center;
 float objectRealLength;
+char* meshName;
+bool meshChanged = false;
 
 //state boolean variables
 bool drawType=false;
@@ -80,7 +85,7 @@ GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
 GLfloat shine = 100.0;
 
 
-//shaders variables
+//Shader variables
 GLuint   phong_program_object;  // a handler to the GLSL program used to update
 GLuint   phong_vertex_shader;   // a handler to vertex shader of the phong shading ('1')
 GLuint   phong_fragment_shader; // a handler to fragment shader of the phong shading ('1')
@@ -93,6 +98,7 @@ GLuint   procedural_program_object;
 GLuint   procedural_vertex_shader;   // a handler to vertex shader of the procedural shading ('3')
 GLuint   procedural_fragment_shader; // a handler to fragment shader of the procedural shading ('3')
 GLint    objRadiusInShader;          // a handler to the uniform variable in the shader saves the object radius
+
 ///////////////////////////// TO DELETE ////////////////////////////////////////////////////
 GLuint   blinn_phong_program_object;  // a handler to the GLSL program used to update
 GLuint   blinn_phong_vertex_shader;   // a handler to vertex shader of the blinn-phong shading ('5')
@@ -122,107 +128,102 @@ static void printProgramInfoLog(GLuint obj)
 }
 
 
-
-
-
-
 // Load shader from disk into a null-terminated string
 char *LoadShaderText(const char *fileName)
 {
-    char *shaderText = NULL;
-    GLint shaderLength = 0;
-    FILE *fp;
-    size_t readNum;
+	char *shaderText = NULL;
+	GLint shaderLength = 0;
+	FILE *fp;
+	size_t readNum;
 
-    fp = fopen(fileName, "r");
-    if (fp != NULL)
-    {
-        while (fgetc(fp) != EOF)
-        {
-            shaderLength++;
-        }
-        rewind(fp);
-        shaderText = (GLchar *)malloc(shaderLength+1);
-        if (shaderText != NULL)
-        {
-            readNum = fread(shaderText, 1, shaderLength, fp);
-            if (readNum == 0)
-            	return shaderText;
-        }
-        shaderText[shaderLength] = '\0';
-        fclose(fp);
-    }
-
-    return shaderText;
+	fp = fopen(fileName, "r");
+	if (fp != NULL){
+		while (fgetc(fp) != EOF){
+			shaderLength++;
+		}
+		rewind(fp);
+		shaderText = (GLchar *)malloc(shaderLength+1);
+		if (shaderText != NULL){
+			readNum = fread(shaderText, 1, shaderLength, fp);
+			if (readNum == 0)
+				return shaderText;
+		}
+		shaderText[shaderLength] = '\0';
+		fclose(fp);
+	}
+	return shaderText;
 }
 
-void setupShaders(GLuint* program_object,GLuint* vertex_shader,GLuint* fragment_shader,const char* vshader_name,const char* fshader_name)
-{
-	
+/*
+ * used to initialize a program running a vertex and fragment shader based on the given pointer to program object,
+ * shader objects and names.
+ */
+void setupShaders(GLuint* program_object,GLuint* vertex_shader,GLuint* fragment_shader,const char* vshader_name,const char* fshader_name){
+
 	*program_object = glCreateProgram();    // creating a program object
 
 	GLchar *vertex_source;
 	GLchar *fragment_source;
 
-	//creating and compiling the phong shaders
 	vertex_source = LoadShaderText(vshader_name);
 	fragment_source = LoadShaderText(fshader_name);
-	   
-   
-   *vertex_shader   = glCreateShader(GL_VERTEX_SHADER);   // creating a vertex shader object
-   *fragment_shader = glCreateShader(GL_FRAGMENT_SHADER); // creating a fragment shader object
-   printProgramInfoLog(*program_object);
-   
-   glShaderSource(*vertex_shader, 1, (const GLchar**)&vertex_source, NULL); // assigning the vertex source
-   glShaderSource(*fragment_shader, 1, (const GLchar**)&fragment_source, NULL); // assigning the fragment source
-   printProgramInfoLog(*program_object);   // verifies if all this is ok so far
 
-   // compiling and attaching the vertex shader onto program
-   glCompileShader(*vertex_shader);
-   glAttachShader(*program_object, *vertex_shader); 
-   printProgramInfoLog(*program_object);   // verifies if all this is ok so far
 
-   // compiling and attaching the fragment shader onto program
-   glCompileShader(*fragment_shader);
-   glAttachShader(*program_object, *fragment_shader); 
-   printProgramInfoLog(*program_object);   // verifies if all this is ok so far
-   
-   // Link the shaders into a complete GLSL program.
-   glLinkProgram(*program_object);
-   printProgramInfoLog(*program_object);   // verifies if all this is ok so far
+	*vertex_shader   = glCreateShader(GL_VERTEX_SHADER);   // creating a vertex shader object
+	*fragment_shader = glCreateShader(GL_FRAGMENT_SHADER); // creating a fragment shader object
+	printProgramInfoLog(*program_object);
 
-   free(vertex_source);
-   free(fragment_source);
-    
-   // some extra code for checking if all this initialization is ok
-   GLint prog_link_success;
-   glGetObjectParameterivARB(*program_object, GL_OBJECT_LINK_STATUS_ARB, &prog_link_success);
-   if (!prog_link_success) {
-     fprintf(stderr, "The shaders could not be linked\n");
-     exit(1);
-   }
-   
+	glShaderSource(*vertex_shader, 1, (const GLchar**)&vertex_source, NULL); // assigning the vertex source
+	glShaderSource(*fragment_shader, 1, (const GLchar**)&fragment_source, NULL); // assigning the fragment source
+	printProgramInfoLog(*program_object);   // verifies if all this is ok so far
+
+	// compiling and attaching the vertex shader onto program
+	glCompileShader(*vertex_shader);
+	glAttachShader(*program_object, *vertex_shader);
+	printProgramInfoLog(*program_object);   // verifies if all this is ok so far
+
+	// compiling and attaching the fragment shader onto program
+	glCompileShader(*fragment_shader);
+	glAttachShader(*program_object, *fragment_shader);
+	printProgramInfoLog(*program_object);   // verifies if all this is ok so far
+
+	// Link the shaders into a complete GLSL program.
+	glLinkProgram(*program_object);
+	printProgramInfoLog(*program_object);   // verifies if all this is ok so far
+
+	free(vertex_source);
+	free(fragment_source);
+
+	// some extra code for checking if all this initialization is ok
+	GLint prog_link_success;
+	glGetObjectParameterivARB(*program_object, GL_OBJECT_LINK_STATUS_ARB, &prog_link_success);
+	if (!prog_link_success) {
+		fprintf(stderr, "The shaders could not be linked\n");
+		exit(1);
+	}
+
 	return ;
-
-
-
 }
 
 
+/*
+ * a function used to initialize all the required shaders and to set the initial running
+ * program (fixed functiionality program)
+ */
 void shadersInit(void)
 {
 	//init shaders
 	setupShaders(&phong_program_object,&phong_vertex_shader,&phong_fragment_shader,PHONG_VS,PHONG_FS);
 	setupShaders(&cell_program_object,&cell_vertex_shader,&cell_fragment_shader,CELL_VS,CELL_FS);
 	setupShaders(&procedural_program_object,&procedural_vertex_shader,&procedural_fragment_shader,PROCEDURAL_VS,PROCEDURAL_FS);
-	
+
 	////////////////////////////////////////////////////////// TO DELETE ///////////////////////////////////////////////////////////
 	setupShaders(&blinn_phong_program_object,&blinn_phong_vertex_shader,&blinn_phong_fragment_shader,BLINN_PHONG_VS,BLINN_PHONG_FS);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//run with fixed functionality
 	glUseProgram(SHADERS_FIXED_FUNCTIONALITY);
-   
+
 	return;
 }
 
@@ -264,6 +265,15 @@ void updateOldTransformsMatrix()
 		glGetFloatv(GL_MODELVIEW_MATRIX,sphereTransforms);
 	}
 	glPopMatrix();
+
+}
+
+/*
+ * loads the mesh from the given input model name.
+ * If the model could not be loaded, the program exits
+ */
+void loadMesh(){
+
 
 }
 
@@ -341,24 +351,22 @@ int main(int argc, char * argv[])
 	glutMotionFunc(motion);
 
 
-
-
-
+	//Retrieving model name.
+	meshName = argv[ARGUMENTS_INPUTFILE];
 
 
 	// try to load the mesh from the given input file //
-	if (!OpenMesh::IO::read_mesh(*mesh, argv[ARGUMENTS_INPUTFILE]))
+	if (!OpenMesh::IO::read_mesh(*mesh, meshName))
 	{
 		// if we didn't make it, exit...  //
 		fprintf(stderr, "Error loading mesh, Aborting.\n");
 		return RC_INPUT_ERROR;
 	}
 
-	//initial matrixs
+	//initial matrixes
 	initialMatrix(oldTransforms);
 	initialMatrix(sphereTransforms);
 	initialMatrix(currentTransform);
-
 
 	computeCenterAndBoundingBox(*mesh);
 
@@ -416,24 +424,24 @@ void setMaterial(){
  */
 void addLightToScene(){
 	switch (lightType){
-				case 0:{ //point light
-				spotAngle = NO_SPOT_ANGLE;
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-				break;
-			}
-			case 1:{ //spot light
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-				glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
-				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-				break;
-			}
-			case 2:{ //directional
-				spotAngle = NO_SPOT_ANGLE;
-				glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position_directional);
-				break;
-			}
-		}
+	case 0:{ //point light
+		spotAngle = NO_SPOT_ANGLE;
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		break;
+	}
+	case 1:{ //spot light
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDirection);
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		break;
+	}
+	case 2:{ //directional
+		spotAngle = NO_SPOT_ANGLE;
+		glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, spotAngle);
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position_directional);
+		break;
+	}
+	}
 }
 
 /*
@@ -463,7 +471,7 @@ void addModelToScene(){
 			glColor3f(BLACK);
 			drawModel(*mesh);
 			glDisable(GL_POLYGON_OFFSET_FILL);
-			}
+		}
 		else
 			drawModel(*mesh);
 	}
@@ -592,7 +600,7 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW) ;
 	glLoadIdentity() ;
 	circle->drawCircle();
-	
+
 	//return to run with last shader
 	if (lastShaderRun != NULL)
 		glUseProgram(*lastShaderRun);
@@ -656,6 +664,15 @@ void keyboard(unsigned char key, int x, int y)
 	case KEY_UPPER_RESET:
 	case KEY_RESET:
 	{
+
+		if (meshChanged){
+			if (!OpenMesh::IO::read_mesh(*mesh, meshName)){
+				// if we didn't make it, exit...  //
+				fprintf(stderr, "Error loading mesh, Aborting.\n");
+				exit(RC_INPUT_ERROR);
+			}
+		}
+		hiddenSufaceRemovalEnable = false;
 		initialMatrix(currentTransform);
 		initialMatrix(oldTransforms);
 		initialMatrix(sphereTransforms);
@@ -665,6 +682,7 @@ void keyboard(unsigned char key, int x, int y)
 		light_position[3] = 1.0;
 		drawType = false;
 		runWithShaders = false;
+		normalTypeSmooth = false;
 		lastShaderRun = NULL;
 		glUseProgram(SHADERS_FIXED_FUNCTIONALITY);
 		break;
@@ -713,41 +731,37 @@ void keyboard(unsigned char key, int x, int y)
 	case 'L':
 	case 'l':
 	{
-		//if (!runWithShaders){
 		if (drawType){
-		lightType = (lightType+1) % 3;
-		if (lightType == 1) {
-			if (!runWithShaders) spotAngle = INITIAL_SPOT_ANGLE;
-			else lightType = 2; //skip spot light in case of shaders
+			lightType = (lightType+1) % 3;
+			if (lightType == 1) {
+				if (!runWithShaders) spotAngle = INITIAL_SPOT_ANGLE;
+				else lightType = 2; //skip spot light in case of shaders
+			}
 		}
-		}
-		//}
 		break;
 	}
 
 	case 'S':
 	case 's':
 	{
-		//Mesh* newMesh;
 		mesh = subDivitionWithCutmullClark(mesh);
-		cout << "here3" << endl;
-
+		meshChanged = true;
 		break;
 	}
 
 	case '+':
 	{
 		if (lightType == 1){
-		if (spotAngle < NO_SPOT_ANGLE/2)
-			spotAngle++;
+			if (spotAngle < NO_SPOT_ANGLE/2)
+				spotAngle++;
 		}
 		break;
 	}
 
 	case '-':{
 		if (lightType == 1){
-		if (spotAngle > INITIAL_SPOT_ANGLE)
-			spotAngle--;
+			if (spotAngle > INITIAL_SPOT_ANGLE)
+				spotAngle--;
 		}
 		break;
 	}
@@ -756,7 +770,7 @@ void keyboard(unsigned char key, int x, int y)
 		lastShaderRun = NULL;
 		glUseProgram(SHADERS_FIXED_FUNCTIONALITY);
 		break;
-		}
+	}
 
 	case '1':{
 		drawType = true;
@@ -773,7 +787,7 @@ void keyboard(unsigned char key, int x, int y)
 		//lightType = 2;
 		glUseProgram(cell_program_object);
 		break;
-		}
+	}
 	case '3':{
 		drawType = true;
 		runWithShaders = true;	
@@ -781,18 +795,18 @@ void keyboard(unsigned char key, int x, int y)
 		lastShaderRun = &procedural_program_object;
 		glUseProgram(procedural_program_object);
 		objRadiusInShader = glGetUniformLocation(procedural_program_object, "objRadius");
-        glUniform1f(objRadiusInShader, objRadius);
+		glUniform1f(objRadiusInShader, objRadius);
 		break;
-		}
-	 ///////////////////////////// TO DELETE /////////////////////////
-     case '5':{
+	}
+	///////////////////////////// TO DELETE /////////////////////////
+	case '5':{
 		drawType = true;
 		runWithShaders = true;
 		lightType = 2;
 		lastShaderRun = &blinn_phong_program_object;
 		glUseProgram(blinn_phong_program_object);
 		break;
-		}
+	}
 	///////////////////////////////////////////////////////////////////
 
 	}
@@ -900,9 +914,7 @@ void motion(int x, int y)
  * iterating over the faces in the model. Drawing every face as a polygon to the screen.
  * mesh - the mesh object of the model
  */
-void drawModel(Mesh& mesh)
-{
-
+void drawModel(Mesh& mesh){
 	Mesh::FaceIter fIter;
 	Mesh::FaceHandle fHandle;
 	Mesh::VertexIter vIter;
@@ -911,66 +923,61 @@ void drawModel(Mesh& mesh)
 	Mesh::FaceVertexIter fvIter;
 	Vector3F normal;
 
-	{
-
-		for (fIter = mesh.faces_begin(); fIter != mesh.faces_end(); ++fIter)
-		{
-			fHandle = fIter.handle();
-			fvIter = mesh.fv_iter(fHandle);
-			glBegin(GL_POLYGON);
-			for (fvIter = mesh.fv_iter(fHandle); fvIter ;++fvIter)
-			{
-				vHandle = fvIter.handle();
-				point = mesh.point(vHandle);
-				// pressing N changes normal calculation
-				if (normalTypeSmooth)
-					normal = mesh.normal(vHandle);
-				else
-					normal = mesh.normal(fHandle);
-				glNormal3f(normal[0],normal[1],normal[2]);
-				glVertex3d(point[0],point[1],point[2]);
-			}
-			glEnd();
+	for (fIter = mesh.faces_begin(); fIter != mesh.faces_end(); ++fIter){
+		fHandle = fIter.handle();
+		fvIter = mesh.fv_iter(fHandle);
+		glBegin(GL_POLYGON);
+		for (fvIter = mesh.fv_iter(fHandle); fvIter ;++fvIter){
+			vHandle = fvIter.handle();
+			point = mesh.point(vHandle);
+			// pressing N changes normal calculation
+			if (normalTypeSmooth)
+				normal = mesh.normal(vHandle);
+			else
+				normal = mesh.normal(fHandle);
+			glNormal3f(normal[0],normal[1],normal[2]);
+			glVertex3d(point[0],point[1],point[2]);
 		}
+		glEnd();
 	}
+
 }
 
-	/*
+/*
   This function computes the geometrical center and
   the axis aligned bounding box of the object.
   The bounding box is represented by the lower left and upper right
   corners.
-	 */
+ */
 
-	void computeCenterAndBoundingBox(Mesh& mesh)
+void computeCenterAndBoundingBox(Mesh& mesh){
+	/* Vertex iterator is an iterator which goes over all the vertices of the mesh */
+	Mesh::VertexIter vertexIter;
+
+	/* This is the specific class used to store the geometrical position of the vertices of the mesh */
+	Mesh::Point p;
+
+	/* number of vertices in the mesh */
+	int vNum = mesh.n_vertices();
+
+
+	vertexIter = mesh.vertices_begin();
+	lowerLeft = upperRight = mesh.point(vertexIter);
+
+	/* This is how to go over all the vertices in the mesh */
+	for (vertexIter = mesh.vertices_begin();vertexIter != mesh.vertices_end();++vertexIter)
 	{
-		/* Vertex iterator is an iterator which goes over all the vertices of the mesh */
-		Mesh::VertexIter vertexIter;
-
-		/* This is the specific class used to store the geometrical position of the vertices of the mesh */
-		Mesh::Point p;
-
-		/* number of vertices in the mesh */
-		int vNum = mesh.n_vertices();
-
-
-		vertexIter = mesh.vertices_begin();
-		lowerLeft = upperRight = mesh.point(vertexIter);
-
-		/* This is how to go over all the vertices in the mesh */
-		for (vertexIter = mesh.vertices_begin();vertexIter != mesh.vertices_end();++vertexIter)
+		/* this is how to get the point associated with the vertex */
+		p = mesh.point(vertexIter);
+		center += p;
+		for (int i = 0;i < 3;i++)
 		{
-			/* this is how to get the point associated with the vertex */
-			p = mesh.point(vertexIter);
-			center += p;
-			for (int i = 0;i < 3;i++)
-			{
-				if (lowerLeft[i] > p[i])
-					lowerLeft[i] = p[i];
-				if (upperRight[i] < p[i])
-					upperRight[i] = p[i];
-			}
+			if (lowerLeft[i] > p[i])
+				lowerLeft[i] = p[i];
+			if (upperRight[i] < p[i])
+				upperRight[i] = p[i];
 		}
-		center /= (double)vNum;
 	}
+	center /= (double)vNum;
+}
 
