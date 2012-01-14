@@ -1,0 +1,28 @@
+amirlaz, maord
+===============================================================================
+Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
+Maor Dayan,       ID 300564770, maor.dayan@mail.huji.ac.il
+===============================================================================
+
+                           Ex 2 - Lighting
+                           ----------------
+ 
+
+Submitted Files
+---------------
+README - This file.
+ex2.cpp - Implemented according to the template. mouse, keyboard, openMesh logic
+          and final display calculations. It includes also the lighting implementation.
+ex2.h - header that contains declarations for ex2.cpp.
+arcBall.cpp - Implementation for arc-ball transformation.
+arcBall.h - header that contains declarations for arcBall.cpp.
+circle.cpp - draws 2d circle given radius.
+circle.h - header that contains declarations for circle.cpp.
+Makefile
+
+Remarks
+-------
+* We implemented the bonus mission (Hidden line surfaces).
+* Material change is done by changing randomly the values of the 
+  diffuse component of the material.
+ 

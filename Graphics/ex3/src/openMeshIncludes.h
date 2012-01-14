@@ -29,7 +29,4 @@ void computeCenterAndBoundingBox(Mesh& mesh);
 
 Mesh* subDivitionWithCutmullClark(Mesh* mesh);
 
-
-
-
 #endif

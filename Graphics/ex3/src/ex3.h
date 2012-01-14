@@ -24,17 +24,18 @@ using namespace std;
 
 
 #include "openMeshIncludes.h"
-#include "GLee.h"
+
 //////////////////////////////
 // GL Includes              //
 //////////////////////////////
-
+#include "GLee.h"
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
 #include "circle.h"
 #include "arcBall.h"
+#include "shaderFunctions.h"
 //////////////////////////////
 // Defines                  //
 //////////////////////////////
@@ -69,28 +70,6 @@ using namespace std;
 
 
 //////////////////////////////
-// Mouse Definitions        //
-//////////////////////////////
-#define LEFT_BUTTON 0
-#define MIDDLE_BUTTON 1
-#define RIGHT_BUTTON 2
-#define KEY_PRESSED 0
-#define KEY_REALESED 1
-
-//////////////////////////////
-// Key Definitions      //
-//////////////////////////////
-#define KEY_UPPER_QUIT      ('Q') // Keys used to terminate the program         //
-#define KEY_QUIT            ('q')
-#define KEY_UPPER_RESET     ('R') // Keys used to reset the applied TX's        //
-#define KEY_RESET           ('r')
-
-
-
-
-
-
-//////////////////////////////
 // Shaders Definitions      //
 //////////////////////////////
 #define PHONG_VS "./shaders/phong_refvec_vs.glsl"
@@ -107,7 +86,47 @@ using namespace std;
 #define BLINN_PHONG_FS "./shaders/phong_fs.glsl"
 ////////////////////////////////////////////////////////////
 
+//////////////////////////////
+// Shader variables        //
+//////////////////////////////
+GLuint   phong_program_object;  // a handler to the GLSL program used to update
+GLuint   phong_vertex_shader;   // a handler to vertex shader of the phong shading ('1')
+GLuint   phong_fragment_shader; // a handler to fragment shader of the phong shading ('1')
 
+GLuint   cell_program_object;
+GLuint   cell_vertex_shader;   // a handler to vertex shader of the cell shading ('2')
+GLuint   cell_fragment_shader; // a handler to fragment shader of the cell shading ('2')
+
+GLuint   procedural_program_object;
+GLuint   procedural_vertex_shader;   // a handler to vertex shader of the procedural shading ('3')
+GLuint   procedural_fragment_shader; // a handler to fragment shader of the procedural shading ('3')
+GLint    objRadiusInShader;          // a handler to the uniform variable in the shader saves the object radius
+
+///////////////////////////// TO DELETE ////////////////////////////////////////////////////
+GLuint   blinn_phong_program_object;  // a handler to the GLSL program used to update
+GLuint   blinn_phong_vertex_shader;   // a handler to vertex shader of the blinn-phong shading ('5')
+GLuint   blinn_phong_fragment_shader; // a handler to fragment shader of the blinn-phong shading ('5')
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+//////////////////////////////
+// Mouse Definitions        //
+//////////////////////////////
+#define LEFT_BUTTON 0
+#define MIDDLE_BUTTON 1
+#define RIGHT_BUTTON 2
+#define KEY_PRESSED 0
+#define KEY_REALESED 1
+
+//////////////////////////////
+// Key Definitions      //
+//////////////////////////////
+#define KEY_UPPER_QUIT      ('Q') // Keys used to terminate the program         //
+#define KEY_QUIT            ('q')
+#define KEY_UPPER_RESET     ('R') // Keys used to reset the applied TX's        //
+#define KEY_RESET           ('r')
 
 //////////////////////////////
 // Functions declarations   //
@@ -135,12 +154,8 @@ void motion(int x, int y) ;
 void drawModel(Mesh& mesh);
 void drawSolid(Mesh& mesh);
 
-// shaders reletad functions
-char *LoadShaderText(const char *fileName);
+// shader init //
 void shadersInit(void);
-
-
-
 
 #endif
 
