@@ -4,25 +4,50 @@ Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
 Maor Dayan,       ID 300564770, maor.dayan@mail.huji.ac.il
 ===============================================================================
 
-                           Ex 2 - Lighting
-                           ----------------
+                           Exercise 3 – Shaders & Subdivision Surface
+                           ------------------------------------------------
  
 
 Submitted Files
 ---------------
 README - This file.
-ex2.cpp - Implemented according to the template. mouse, keyboard, openMesh logic
-          and final display calculations. It includes also the lighting implementation.
-ex2.h - header that contains declarations for ex2.cpp.
+ex3.cpp - main file running the exercise.
+ex3.h - header that contains declarations for ex3.cpp.
 arcBall.cpp - Implementation for arc-ball transformation.
 arcBall.h - header that contains declarations for arcBall.cpp.
 circle.cpp - draws 2d circle given radius.
 circle.h - header that contains declarations for circle.cpp.
+catmullclark.cpp - implemantation of catmull-clark subdivision algorithm.
+GLee.cpp - for working with shaders.
+GLee.h - the required header for working with shaders.
+openMeshIncludes.h - header that include of the openMesh related include's in the ex.
+shaderFunctions.cpp - include function for working with shaders.
+shaderFunctions.h - the declaration of the functions from last file.
+shaders\phong_vs.glsl - phong vertex shader (part 1)
+shaders\phong_fs.glsl - phong fragment shader (part 1)
+shaders\cell_vs.glsl - cell vertex shader
+shaders\cell_fs.glsl - cell fragment shader
+shaders\procedural_vs.glsl - procedural vertex shader
+shaders\procedural_fs.glsl - procedural fragment shader
 Makefile
+
+
+Answer (phong shader question):
+--------------------------------
+The most significant difference we see when switching between the phong
+and the blinn models is that in the blinn model the specular highlights
+appear to be bigger and "spread" over larger area then in the phong 
+model. The reason for that is that according to the model, the angle between
+the viewer (V) and the reflected beam (R) is larger then the angle between the 
+normal (N) and the half-verctor(H) (at most cases the first is twice the second). 
+Therefore the cosine of the second angle(the blinn angle) is larger. 
+Because the cosine of the angles equals to the dot products that is used in the models, 
+the dot product of N and H (which is used in the blinn model) is greater 
+then the dot product between V and R (which is used in the phong model). 
+This causes the specular calculation in the blinn model to get greater values, 
+and therefore causes the highlights to appear bigger in the blinn model.
 
 Remarks
 -------
-* We implemented the bonus mission (Hidden line surfaces).
-* Material change is done by changing randomly the values of the 
-  diffuse component of the material.
+* We had an extension of 1 day.
  
