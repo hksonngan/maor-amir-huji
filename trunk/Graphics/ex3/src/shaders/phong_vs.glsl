@@ -1,5 +1,5 @@
 varying vec3 normal,vertexVector;
-varying vec4 diffuse,ambientWithGlobal,specular;
+varying vec4 diffuse,ambientWithGlobal,specular,backDiffuse;
 
 
 void main()
@@ -17,6 +17,8 @@ void main()
     
 	/* Computing the vertex vector for the fragment shader */
     vertexVector = vec3(gl_ModelViewMatrix*gl_Vertex);
+
+   backDiffuse = gl_BackMaterial.diffuse * gl_LightSource[0].diffuse;
 	
     gl_Position = ftransform();
 }

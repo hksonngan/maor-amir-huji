@@ -106,10 +106,6 @@ void shadersInit(void)
 	setupShaders(&cell_program_object,&cell_vertex_shader,&cell_fragment_shader,CELL_VS,CELL_FS);
 	setupShaders(&procedural_program_object,&procedural_vertex_shader,&procedural_fragment_shader,PROCEDURAL_VS,PROCEDURAL_FS);
 
-	////////////////////////////////////////////////////////// TO DELETE ///////////////////////////////////////////////////////////
-	setupShaders(&blinn_phong_program_object,&blinn_phong_vertex_shader,&blinn_phong_fragment_shader,BLINN_PHONG_VS,BLINN_PHONG_FS);
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	//run with fixed functionality
 	glUseProgram(SHADERS_FIXED_FUNCTIONALITY);
 
@@ -289,10 +285,12 @@ void getRandomMaterial()
  * set material of model according to material array
  */
 void setMaterial(){
-	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-	glMaterialf(GL_FRONT, GL_SHININESS, shine);
+	getRandomMaterial();
+	glMaterialfv(GL_BACK, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
 }
 
 /*
@@ -532,7 +530,8 @@ void keyboard(unsigned char key, int x, int y)
 	{
 	case KEY_UPPER_QUIT:
 	case KEY_QUIT:
-	{
+	{	
+		delete mesh;
 		exit(0);
 		break;
 
@@ -622,6 +621,8 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		mesh = subDivitionWithCutmullClark(mesh);
 		meshChanged = true;
+		computeCenterAndBoundingBox(*mesh);
+		computeObjectInitScale();
 		break;
 	}
 
@@ -674,17 +675,6 @@ void keyboard(unsigned char key, int x, int y)
 		glUniform1f(objRadiusInShader, objRadius);
 		break;
 	}
-	///////////////////////////// TO DELETE /////////////////////////
-	case '5':{
-		drawType = true;
-		runWithShaders = true;
-		lightType = 2;
-		lastShaderRun = &blinn_phong_program_object;
-		glUseProgram(blinn_phong_program_object);
-		break;
-	}
-	///////////////////////////////////////////////////////////////////
-
 	}
 	glutPostRedisplay();
 	return;

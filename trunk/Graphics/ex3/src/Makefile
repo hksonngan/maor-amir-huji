@@ -10,12 +10,8 @@ OM_DIR = $(CG_HOME)/OpenMesh
 OM_LIBS = -L$(OM_DIR)/lib -lOpenMeshCore
 OM_INCLUDE=  -I$(OM_DIR)/include
 
-#for home compilation
-OM_LIBS = -L/usr/local/lib/OpenMesh/ -lOpenMeshCore
-OM_INCLUDE = -I/usr/local/include/OpenMesh/
-
 LINK_FLAGS = -lGL -lGLU -lglut $(OM_LIBS)
-COMP_FLAGS =  -I/usr/include -I/usr/X11R6/include #$(OM_INCLUDE)
+COMP_FLAGS =  -I/usr/include -I/usr/X11R6/include $(OM_INCLUDE)
 
 all: ex3
 
