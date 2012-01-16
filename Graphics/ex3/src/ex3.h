@@ -72,19 +72,14 @@ using namespace std;
 //////////////////////////////
 // Shaders Definitions      //
 //////////////////////////////
-#define PHONG_VS "./shaders/phong_refvec_vs.glsl"
-#define PHONG_FS "./shaders/phong_refvec_fs.glsl"
+#define PHONG_VS "./shaders/phong_vs.glsl"
+#define PHONG_FS "./shaders/phong_fs.glsl"
 #define CELL_VS "./shaders/cell_vs.glsl"
 #define CELL_FS "./shaders/cell_fs.glsl"
 #define PROCEDURAL_VS "./shaders/procedural_vs.glsl"
 #define PROCEDURAL_FS "./shaders/procedural_fs.glsl"
 #define SHADERS_FIXED_FUNCTIONALITY 0
 
-
-///////////////////////////////////TO DELETE ///////////////
-#define BLINN_PHONG_VS "./shaders/phong_vs.glsl"
-#define BLINN_PHONG_FS "./shaders/phong_fs.glsl"
-////////////////////////////////////////////////////////////
 
 //////////////////////////////
 // Shader variables        //
@@ -101,15 +96,6 @@ GLuint   procedural_program_object;
 GLuint   procedural_vertex_shader;   // a handler to vertex shader of the procedural shading ('3')
 GLuint   procedural_fragment_shader; // a handler to fragment shader of the procedural shading ('3')
 GLint    objRadiusInShader;          // a handler to the uniform variable in the shader saves the object radius
-
-///////////////////////////// TO DELETE ////////////////////////////////////////////////////
-GLuint   blinn_phong_program_object;  // a handler to the GLSL program used to update
-GLuint   blinn_phong_vertex_shader;   // a handler to vertex shader of the blinn-phong shading ('5')
-GLuint   blinn_phong_fragment_shader; // a handler to fragment shader of the blinn-phong shading ('5')
-////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 
 //////////////////////////////
 // Mouse Definitions        //
@@ -156,6 +142,9 @@ void drawSolid(Mesh& mesh);
 
 // shader init //
 void shadersInit(void);
+
+//catmull-clark subdivision function
+Mesh* subDivitionWithCutmullClark(Mesh* mesh);
 
 #endif
 

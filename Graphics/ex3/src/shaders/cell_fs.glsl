@@ -24,7 +24,9 @@ void main(){
      else lightVector = normalize(vec3(gl_LightSource[0].position) - vertexVector ); //point light
 	
 	//calculating the dot product.(A bigger result means smaller angle)
-	normLightDot = dot(norm,lightVector);
+	if (gl_FrontFacing)
+		normLightDot = dot(norm,lightVector);
+	else normLightDot = dot(-norm,lightVector);
 	//choosing the based on the dot product
 	if (normLightDot > 0.8)
 		fragColor = colors[0];

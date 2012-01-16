@@ -20,13 +20,8 @@ typedef OpenMesh::PolyMesh_ArrayKernelT<> Mesh;
 typedef OpenMesh::VectorT<float, 3> Vector3F;
 
 
-//void faceCenter(Mesh & mesh);
-void computeCenterAndBoundingBox(Mesh& mesh);
-//void faceValenceCounter(Mesh& mesh);
-//void edgesLengths(Mesh& mesh);
-//void faceCenter(Mesh & mesh);
-//void vectorDemo();
 
-Mesh* subDivitionWithCutmullClark(Mesh* mesh);
+void computeCenterAndBoundingBox(Mesh& mesh);
+
 
 #endif

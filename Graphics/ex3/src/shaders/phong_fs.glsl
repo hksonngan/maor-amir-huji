@@ -1,5 +1,5 @@
 varying vec3 normal,vertexVector;
-varying vec4 diffuse,ambientWithGlobal,specular;
+varying vec4 diffuse,ambientWithGlobal,specular,backDiffuse;
 
 
 void main(){
@@ -27,18 +27,27 @@ void main(){
     The light is directional so the direction is constant for every vertex.
     Since these two are normalized the cosine is the dot product. We also 
     need to clamp the result to the [0,1] range. */
-    NdotL = max(dot(normalizedNormal, lightVector), 0.0);
 
 
-	//computing reflection vector (R)
-	reflectionVector = normalize(-reflect(lightVector,normalizedNormal));
+    if (!gl_FrontFacing)
+	NdotL = max(dot(-normalizedNormal, lightVector),0.0);
+    else
+    	NdotL = max(dot(normalizedNormal, lightVector), 0.0);
 
+
+   //computing reflection vector (R)
+   reflectionVector = normalize(-reflect(lightVector,normalizedNormal));
+
+
+   
 
 	/* compute the diffuse and specular term if NdotL is  larger than zero */
     if (NdotL > 0.0)
     {
 		//adding diffuse term to fragColor
-		fragColor = diffuse * NdotL;
+		if (gl_FrontFacing)
+			fragColor = diffuse * NdotL;
+		else fragColor = backDiffuse * NdotL;
 
 		//adding specular term to fragColor
 		NdotRE = max(dot(reflectionVector,eyeVector),0.0);

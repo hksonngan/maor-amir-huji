@@ -1,5 +1,4 @@
 
-
 #include "openMeshIncludes.h"
 
 #include <iostream>
@@ -147,7 +146,7 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh){
 				center += mesh.point(tempHandle);
 				edgesCounter++;
 			}
-			center = center*0.25 / edgesCounter;
+			center = (center / edgesCounter)*0.25;
 			center += mesh.point(vHandle)*0.75;
 		}
 		else{ //not in boundary
@@ -177,7 +176,7 @@ void addVertexPoint(Mesh& mesh,Mesh& newMesh){
 			center += tempPoint*2.0*coef / (float) counter;
 
 			//adding this vertex to the calculation
-			center += mesh.point(vHandle)* ((float)vertexValence - 3.0) / (float) vertexValence;
+			center += mesh.point(vHandle)* ((float)vertexValence - 3.0) * coef;
 		}
 		mesh.property(vp_point_handle,vHandle) = newMesh.add_vertex(center);
 	}
@@ -300,7 +299,7 @@ void refineMesh(Mesh& mesh,Mesh& newMesh){
 		++fhIter;
 		for (;fhIter;++fhIter){
 			fhHandle = fhIter.handle();
-			faceHandles[0] = mesh.property(fp_point_handle,fhandle);;
+			faceHandles[0] = mesh.property(fp_point_handle,fhandle);
 			faceHandles[1] = mesh.property(ep_point_handle,mesh.edge_handle(lastvHandle));
 			faceHandles[2] = mesh.property(vp_point_handle,vHandle);
 			faceHandles[3] = mesh.property(ep_point_handle,mesh.edge_handle(fhHandle));

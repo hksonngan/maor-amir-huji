@@ -9,24 +9,21 @@ void main(){
 	vec3 normalizedNormal,reflectionVector,lightVector,eyeVector,vertexVector;
 	vec4 fragColor = vec4(0.0,0.0,0.0,0.0);
 	float NdotL,NdotRE;
-
-	vec4 colors[2]; 
-//	colors[0] = vec4(0.0,0.0,0.0,1.0);
-///	colors[1] = vec4(0.1,0.1,0.1,1.0);
-
 	
 
 	/* set the checkerboard colors */
 	if (mod(floor(4.0*vertex.x/objRadius) + floor(4.0*vertex.y/objRadius) + floor(2.0*vertex.z/objRadius),2.0) < 1.0)
-	{
-//		fragColor = colors[1];
+	{	
 		diffuse = vec4(0.0,0.0,0.0,1.0);
 		}
 	else{ 
-//	fragColor = colors[0];
-	diffuse = vec4(1.0,1.0,1.0,1.0);
+	if (gl_FrontFacing)
+		diffuse = vec4(1.0,1.0,1.0,1.0);
+	else    diffuse = vec4(0.0,0.5,0.5,1.0);
 
 	}
+
+
 
 	/* Compute the diffuse and specular terms */
 	diffuse = diffuse * gl_LightSource[0].diffuse;
@@ -50,7 +47,9 @@ void main(){
     The light is directional so the direction is constant for every vertex.
     Since these two are normalized the cosine is the dot product. We also 
     need to clamp the result to the [0,1] range. */
-    NdotL = max(dot(normalizedNormal, lightVector), 0.0);
+    if (gl_FrontFacing)
+	    NdotL = max(dot(normalizedNormal, lightVector), 0.0);
+    else  NdotL = max(dot(-normalizedNormal, lightVector), 0.0);
 
 
 	//computing reflection vector (R)
