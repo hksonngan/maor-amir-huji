@@ -1,0 +1,156 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/12/Memory.jack
+
+/**
+ * Memory operations library.
+ */ 
+class Memory {
+
+	static Array memory;
+	static int freeList;
+	static int heapLength;
+	
+	
+	
+    /** Initializes memory parameters. */
+    function void init() {
+		let memory = 0;
+		let memory[2048] = 14334;
+		let memory[2049] = 2050;
+		return;
+    }
+
+    /** Returns the value of the main memory at this address. */
+    function int peek(int address) {
+		return memory[address];
+    }
+
+    /** Sets the value of the main memory at this address
+     *  to the given value. */
+    function void poke(int address, int value) {
+		let memory[address] = value;
+		return;
+    }
+
+	
+	/** trying to defrag the heap. Return a segment pointer to a segment bigger then size or -1 otherwise */
+	function int defragHeap(int size){
+		var int currentSegmentAddress;
+		var int firstSegmentAddress;
+		var int accumulateSize;
+		let currentSegmentAddress = 2048;
+		let firstSegmentAddress = 0;
+		let accumulateSize = 0;
+		while (~(memory[currentSegmentAddress+1]) = (currentSegmentAddress+2)){
+			if (memory[currentSegmentAddress] > 0){
+				if (firstSegmentAddress = 0){
+					let firstSegmentAddress = currentSegmentAddress;
+				}
+				let accumulateSize = accumulateSize + memory[currentSegmentAddress];
+			}
+			else{
+				let memory[firstSegmentAddress] = accumulateSize;
+				let memory[firstSegmentAddress+1] = currentSegmentAddress;
+				
+				if (accumulateSize > size){
+					return firstSegmentAddress;
+				}
+				let firstSegmentAddress = 0;
+				let accumulateSize = 0;
+			}
+			let currentSegmentAddress = memory[currentSegmentAddress+1];
+		
+		}
+		
+		if (memory[currentSegmentAddress] > 0){
+				let accumulateSize = accumulateSize + memory[currentSegmentAddress];
+			}
+		else{
+				let memory[firstSegmentAddress] = accumulateSize;
+				let memory[firstSegmentAddress+1] = currentSegmentAddress;			
+				if (accumulateSize > size){
+					return firstSegmentAddress;
+				}
+			}		
+		return -1;
+	}
+	
+	
+    /** finds and allocates from the heap a memory block of the 
+     *  specified size and returns a reference to its base address. */
+    function int alloc(int size) {
+		var int currentSegmentAddress;
+		var int nextSegmentAddress;
+		var int remainSize;
+		var int addressToRet;
+		var bool segmentNotFound,exitWhile;
+		
+		
+		if (~(size > 0)){
+			do Sys.error(5);
+		}
+		let segmentNotFound = true;
+		let currentSegmentAddress = 2048;
+		let exitWhile = ~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2));
+		//while we havent reached the last segment
+		while (segmentNotFound & exitWhile){
+				if (memory[currentSegmentAddress] > (size)){
+					let segmentNotFound = false;
+				}
+				else{
+					let currentSegmentAddress = memory[currentSegmentAddress+1];
+					let exitWhile = ~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2));
+				}
+		}
+		
+		if (memory[currentSegmentAddress] > size)
+		{
+			let segmentNotFound = false;
+		}
+		
+		
+		if (segmentNotFound){
+			let currentSegmentAddress = Memory.defragHeap(size);
+			if (~(currentSegmentAddress = -1)){
+				let segmentNotFound = false;
+			}
+		}
+			
+		if (~segmentNotFound){
+			let remainSize = memory[currentSegmentAddress] - 2 - size;
+			let memory[currentSegmentAddress] = 0;
+			let addressToRet = currentSegmentAddress + 2;
+			//last segment remains less then 2 byte.
+			if ((size + addressToRet) > 16379){
+				do Sys.error(6);
+			}
+			if (remainSize > 2){
+				let nextSegmentAddress = currentSegmentAddress + 2 + size;
+				let memory[nextSegmentAddress] = remainSize;
+				let memory[nextSegmentAddress+1] = memory[currentSegmentAddress+1];
+				let memory[currentSegmentAddress+1] = nextSegmentAddress;
+				return addressToRet;
+			}
+		}
+		return -1;	
+	}
+
+    /** De-allocates the given object and frees its space. */
+    function void deAlloc(int object) {
+		var int segmentAddress;
+		var int nextSegment;
+		
+		let segmentAddress = object - 2;
+		let nextSegment = memory[segmentAddress+1];
+		if (memory[nextSegment] > 0){
+			let memory[segmentAddress+1] = memory[nextSegment+1];
+		}
+		let memory[segmentAddress] = memory[nextSegment] + nextSegment - object;
+		return;
+		
+		
+		
+    }    
+}

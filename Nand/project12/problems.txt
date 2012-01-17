@@ -1,0 +1,5 @@
+Problems:
+in math.multiply - siftedX can be overflown
+in math.divide - how to optimize 2*q*y
+
+in String.intValue - check maybe positive number starts at index 1
