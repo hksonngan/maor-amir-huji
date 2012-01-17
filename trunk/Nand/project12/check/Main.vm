@@ -1,0 +1,21 @@
+function Main.main 3
+push constant 3
+pop local 2
+push constant 100
+call String.new 1
+pop local 0
+push local 0
+push local 2
+call String.setInt 2
+pop local 0
+push local 0
+call Output.printString 1
+pop temp 0
+push local 0
+call String.length 1
+pop local 1
+push local 1
+call Output.printInt 1
+pop temp 0
+push constant 0
+return

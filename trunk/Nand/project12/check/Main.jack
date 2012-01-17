@@ -1,0 +1,21 @@
+class Main
+{
+
+	 function void main() {
+		//do Math.printArray();
+		var String str;
+		var int length;
+		var int number;
+		let number = 3;
+		let str = String.new(100);
+		let str= str.setInt(number);
+		do Output.printString(str);
+		let length = str.length();
+		do Output.printInt(length);
+		
+		return;
+	 
+	 }
+
+
+}
