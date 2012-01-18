@@ -704,13 +704,13 @@ public class CompilationEngine {
 
 			if (tok.symbol()=='(')
 			{
-				printCurrentTokenAl();
+				//printCurrentTokenAl();
 				tok.advance();
 				CompileExpression();
-				expectingSymbol(')');
+				//expectingSymbol(')');
 				break;
 			}
-			// assert(false) : "should not get here, tok: "+tok.getTokenString();
+			assert(false) : "should not get here, tok: "+tok.getTokenString();
 			break;
 		case IDENTIFIER:
 			//TODO : ASK - is it possible to call a void function here
