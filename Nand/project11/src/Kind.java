@@ -1,4 +1,4 @@
 
 public enum Kind {
-	STATIC,FIELD,ARG,VAR
+	STATIC,FIELD,ARG,VAR, NONE
 }
