@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
+// created by Maor SHCHUNA!!
 public class JackCompiler {
 	
 	private static final String VM_SUFFIX = ".vm";
