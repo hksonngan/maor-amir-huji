@@ -11,13 +11,31 @@ public class SymbolTable {
 	
 	private HashMap<String,Symbol> _classHashMap;
 	private HashMap<String,Symbol> _subroutineHashMap;
+	
+	//private HashMap<String, Kind> _kinds;
 
+	/*public Kind strToKind(String s)
+	{
+		Kind k = _kinds.get(s);
+		assert (k!=null) : "wrong variable kind";
+		return k;
+	}*/
+	
+	
+	
+	
 	/*
 	 * Creates a new empty symbol
 	 */
 	public SymbolTable() {
 		_classHashMap = new HashMap<String, SymbolTable.Symbol>();
 		_subroutineHashMap = new HashMap<String, SymbolTable.Symbol>();
+		
+	/*	_kinds = new HashMap<String, Kind>();
+		_kinds.put("static", Kind.STATIC);
+		_kinds.put("arg",Kind.ARG);
+		_kinds.put*/
+		
 	}
 
 	/*
@@ -74,7 +92,7 @@ public class SymbolTable {
 		}
 		else if (_classHashMap.containsKey(name))
 				return _classHashMap.get(name).get_kind();
-		else return null;
+		else return Kind.NONE;
 	}
 	
 	/*
@@ -140,6 +158,7 @@ public class SymbolTable {
 		}		
 		
 	}
+	
 	
 	
 	
