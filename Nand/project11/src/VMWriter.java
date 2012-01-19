@@ -76,6 +76,7 @@ public class VMWriter {
 			break;
 		}
 		case '~':{
+			if (isUnary)
 			writeLine("not");
 			break;
 		}

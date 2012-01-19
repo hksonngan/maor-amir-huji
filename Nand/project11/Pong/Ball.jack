@@ -234,4 +234,10 @@ class Ball {
 
 	return;
     }
+	
+	method Ball check(){
+		return this;
+	
+	}
+	
 }
