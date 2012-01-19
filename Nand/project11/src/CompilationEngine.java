@@ -804,9 +804,15 @@ public class CompilationEngine {
 					case '[':
 						//print array name
 						//printAligned("<identifier> " +prevIden + " </identifier>");
-						printCurrentTokenAl();
+						//printCurrentTokenAl();
 						tok.advance();
 						CompileExpression();
+						// here we start compile
+						writer.writePush("local", tbl.indexOf(prevIden));
+						writer.writeArithmetic('+',false);
+						writer.writePop("pointer", 1);
+						writer.writePush("that", 0);
+						//////////////////////////
 						expectingSymbol(']');
 						break;
 					case '(':
