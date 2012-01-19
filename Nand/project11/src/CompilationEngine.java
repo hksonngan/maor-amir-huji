@@ -236,6 +236,10 @@ public class CompilationEngine {
 			writer.writeCall("Memory.alloc",1);
 			writer.writePop("pointer", 0);			
 		}
+		else if (_currentSubroutineType == Keyword.METHOD){
+			writer.writePush("argument",0);
+			writer.writePop("pointer",0);
+		}
 		
 		// token is on first statement
 		compileStatements();
@@ -527,11 +531,12 @@ public class CompilationEngine {
 			
 			callSub = _className + "." + name;
 			tok.advance();
-			nArgs = CompileExpressionList()+1;
+			//TODO remove the if
 			// all arguments already pushed
 			if (_currentSubroutineType == Keyword.CONSTRUCTOR)
 				writer.writePush("pointer",0);
-			else writer.writePush("argument",0);
+			else writer.writePush("pointer",0);
+			nArgs = CompileExpressionList()+1;
 			break;
 		case ')':
 			// TODO: need to erase
@@ -541,6 +546,7 @@ public class CompilationEngine {
 			//printAligned("<identifier> " +name+" </identifier>");
 			
 			boolean isVar = tbl.kindOf(name)==Kind.VAR;
+			//TODO what if the name is field
 			
 			//printCurrentTokenAl();
 			tok.advance();
@@ -559,13 +565,19 @@ public class CompilationEngine {
 			assert(tok.TokenType() == TokenType.SYMBOL) : "expecting '('";
 			//printCurrentTokenAl();
 			tok.advance();
-			if (isVar)
+			if (tbl.typeOf(name) != null)
 			{
-				nArgs = CompileExpressionList() +1;
-				callSub = tbl.typeOf(name) + "." + subName;
-				if (_currentSubroutineType == Keyword.CONSTRUCTOR)
-					writer.writePush("pointer",0);
-				else writer.writePush("argument",0);
+				//nArgs = CompileExpressionList() +1;
+				//callSub = tbl.typeOf(name) + "." + subName;
+				//if (_currentSubroutineType == Keyword.CONSTRUCTOR)
+				//	writer.writePush("pointer",0);
+				//else {
+					//if (_currentSubroutineType == Keyword.METHOD)
+						writePushPopVar(name, true);
+					//writer.writePush("argument",0);
+					nArgs = CompileExpressionList() +1;
+					callSub = tbl.typeOf(name) + "." + subName;
+				//}
 			}else{ //not var =  static function
 				nArgs = CompileExpressionList();
 				callSub = name + "." + subName;
@@ -736,11 +748,11 @@ public class CompilationEngine {
 	private void pushStringConstant(String str) throws IOException
 	{
 		writer.writePush("constant", str.length());
-		writer.writeCall("call String.new", 1);
+		writer.writeCall("String.new", 1);
 		for (int i=0;i<str.length(); i++)
 		{
 			writer.writePush("constant", str.charAt(i));
-			writer.writePush("String.appendChar", 2);
+			writer.writeCall("String.appendChar", 2);
 		}
 	}
 	/**
