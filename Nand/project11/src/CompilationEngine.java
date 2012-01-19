@@ -463,8 +463,10 @@ public class CompilationEngine {
 			// assert(tok.symbol()=='['):"checking '['";
 			tok.advance();
 			CompileExpression();
+			writePushPopVar(varName,true);
+			writer.writeArithmetic('+',false);
 			// assert(tok.TokenType()==TokenType.SYMBOL) : "expecting ']'";
-			printCurrentTokenAl();
+			//printCurrentTokenAl();
 			tok.advance();
 			
 			// doing the '=' part
@@ -830,7 +832,8 @@ public class CompilationEngine {
 						tok.advance();
 						CompileExpression();
 						// here we start compile
-						writer.writePush("local", tbl.indexOf(prevIden));
+						//writer.writePush("local", tbl.indexOf(prevIden));
+						writePushPopVar(prevIden,true);
 						writer.writeArithmetic('+',false);
 						writer.writePop("pointer", 1);
 						writer.writePush("that", 0);
