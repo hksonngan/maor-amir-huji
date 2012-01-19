@@ -104,7 +104,7 @@ public class CompilationEngine {
 			CompileSubroutine();
 		}
 		// tok is ON } of the class
-		assert(tok.TokenType()==TokenType.SYMBOL) :"No class [}] and didnt get symbol";
+		assert(tok.TokenType()==TokenType.SYMBOL) :"No class [}] and didnt get symbol. We get " + tok.getTokenString();
 		assert(tok.symbol()=='}'):"No class [}]" + "we got: "+ tok.getTokenString();
 		//printCurrentTokenAl();
 
@@ -187,8 +187,8 @@ public class CompilationEngine {
 		//writeLine(getAlignedStatement("<subroutineDec>"));
 		depth++;
 		// printing sub function type word
-		//printCurrentTokenAl();
 		_currentSubroutineType =  tok.keyWord();
+
 		tbl.startSubroutine();
 		tok.advance();
 		assert (tok.TokenType()==TokenType.IDENTIFIER ||
@@ -203,6 +203,9 @@ public class CompilationEngine {
 		tok.advance();
 		 assert (tok.TokenType()==TokenType.IDENTIFIER): "expecting sub name";
 		String subName = tok.identifier();
+		
+		System.out.println("compiling subroutine: " + subName);
+		
 		//printCurrentTokenAl();
 		tok.advance();
 		 assert (tok.TokenType()==TokenType.SYMBOL): "expecting '(";
@@ -226,6 +229,13 @@ public class CompilationEngine {
 		writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR));
 		ifIDCounter=-1;
 		whileIDCounter=-1;
+		
+		
+		if (_currentSubroutineType == Keyword.CONSTRUCTOR){
+			writer.writePush("constant",tbl.varCount(Kind.FIELD));
+			writer.writeCall("Memory.alloc",1);
+			writer.writePop("pointer", 0);			
+		}
 		
 		// token is on first statement
 		compileStatements();
@@ -519,7 +529,9 @@ public class CompilationEngine {
 			tok.advance();
 			nArgs = CompileExpressionList()+1;
 			// all arguments already pushed
-			writer.writePush("argument",0);
+			if (_currentSubroutineType == Keyword.CONSTRUCTOR)
+				writer.writePush("pointer",0);
+			else writer.writePush("argument",0);
 			break;
 		case ')':
 			// TODO: need to erase
@@ -530,16 +542,16 @@ public class CompilationEngine {
 			
 			boolean isVar = tbl.kindOf(name)==Kind.VAR;
 			
-			
 			//printCurrentTokenAl();
 			tok.advance();
 			assert(tok.TokenType()==TokenType.IDENTIFIER) : "expecting a sub name";
 			String subName = tok.identifier();
-			if(subName.equals("new"))
-			{
+			//if(subName.equals("new"))
+			//{
 				//TODO: handle ctor call
-				return;
-			}
+				
+				//return;
+			//}
 			// THIS IS THE ELSE PART!!
 			
 			//printCurrentTokenAl();
@@ -551,10 +563,14 @@ public class CompilationEngine {
 			{
 				nArgs = CompileExpressionList() +1;
 				callSub = tbl.typeOf(name) + "." + subName;
-				writer.writePush("argument",0);
+				if (_currentSubroutineType == Keyword.CONSTRUCTOR)
+					writer.writePush("pointer",0);
+				else writer.writePush("argument",0);
 			}else{ //not var =  static function
 				nArgs = CompileExpressionList();
 				callSub = name + "." + subName;
+				
+				
 			}
 			
 			break;
@@ -809,7 +825,7 @@ public class CompilationEngine {
 					//this just an identifier <=> var name
 					//printAligned("<identifier> " +prevIden + " </identifier>");
 					//String varName = tok.identifier();
-					System.out.println("PrevIden is: " + prevIden);
+					//System.out.println("PrevIden is: " + prevIden);
 					writePushPopVar(prevIden,true);
 					
 				}
@@ -911,15 +927,22 @@ public class CompilationEngine {
 			
 		}
 		case THIS:{
-			if (_currentSubroutineType != Keyword.CONSTRUCTOR){
+			/**if (_currentSubroutineType != Keyword.CONSTRUCTOR){
 				writer.writePush("argument",0);
 				writer.writePop("pointer",0);				
 			}
 			writer.writePush("pointer",0);
-			return true;
+			return true;*/
+			//TODO remove if
+			if (_currentSubroutineType == Keyword.CONSTRUCTOR)
+				writer.writePush("pointer",0);
+			else{
+				writer.writePush("pointer",0);	
+				}
+			}
 			
 		}
-		}
+		
 		
 		
 		
