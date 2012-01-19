@@ -469,12 +469,22 @@ public class CompilationEngine {
 			//printCurrentTokenAl();
 			tok.advance();
 			
+			
+			
 			// doing the '=' part
 			expectingSymbol('=');
 			CompileExpression();
+			
+			writer.writePop("temp", 0);
+			writer.writePop("pointer",1);
+			writer.writePush("temp",0);
+			writer.writePop("that",0);
+			
+			
 		}
 
 		expectingSymbol(';');
+		
 		depth--;
 		//printAligned("</letStatement>");
 
