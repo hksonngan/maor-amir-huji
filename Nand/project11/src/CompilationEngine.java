@@ -733,7 +733,16 @@ public class CompilationEngine {
 		return null;
 	}
 
-
+	private void pushStringConstant(String str) throws IOException
+	{
+		writer.writePush("constant", str.length());
+		writer.writeCall("call String.new", 1);
+		for (int i=0;i<str.length(); i++)
+		{
+			writer.writePush("constant", str.charAt(i));
+			writer.writePush("String.appendChar", 2);
+		}
+	}
 	/**
 	 * compiles a term.  This method is faced 
 	 * with a slight difficulty when trying to 
@@ -763,7 +772,8 @@ public class CompilationEngine {
 			tok.advance();
 			break;
 		case STRING_CONST:
-			printCurrentTokenAl();
+			//printCurrentTokenAl();
+			pushStringConstant(tok.stringVal());
 			tok.advance();
 			break;
 		case KEYWORD:
