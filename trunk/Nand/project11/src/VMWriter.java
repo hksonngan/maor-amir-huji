@@ -151,8 +151,6 @@ public class VMWriter {
 	
 	//private function to write new line
 		private void writeLine(String line) throws IOException {
-			//TODO remove this
-			//System.out.println("writes line: " + line);
 			_outStream.write(line);
 			_outStream.newLine();
 			_outStream.flush();

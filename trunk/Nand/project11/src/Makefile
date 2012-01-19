@@ -9,12 +9,12 @@
 JAVAC=javac
 
 
-SRCS=JackAnalyzer.java JackTokenizer.java Keyword.java CompilationEngine.java TokenType.java
-EXEC=JackAnalyzer
+SRCS=JackCompiler.java JackTokenizer.java Keyword.java Kind.java SymbolTable.java VMWriter.java CompilationEngine.java TokenType.java
+EXEC=JackCompiler
 
 TAR=tar
 TARFLAGS=cvf
-TARNAME=project10.tar
+TARNAME=project11.tar
 TARSRCS=$(SRCS) $(EXEC) README Makefile
 
 all: compile
