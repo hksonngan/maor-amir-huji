@@ -20,10 +20,9 @@ push constant 0
 push constant 229
 call Ball.new 6
 pop this 1
-push this 1
 push constant 400
 push constant 0
-call Ball.setDestination 3
+call ball.setDestination 2
 pop temp 0
 push constant 0
 push constant 238
@@ -48,11 +47,9 @@ return
 function PongGame.dispose 0
 push argument 0
 pop pointer 0
-push this 0
-call Bat.dispose 1
+call bat.dispose 0
 pop temp 0
-push this 1
-call Ball.dispose 1
+call ball.dispose 0
 pop temp 0
 push pointer 0
 call Memory.deAlloc 1
@@ -86,8 +83,7 @@ not
 if-goto WHILE_END1
 call Keyboard.keyPressed 0
 pop local 0
-push this 0
-call Bat.move 1
+call bat.move 0
 pop temp 0
 push pointer 0
 call PongGame.moveBall 1
@@ -100,9 +96,8 @@ eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push this 0
 push constant 1
-call Bat.setDirection 2
+call bat.setDirection 1
 pop temp 0
 goto IF_END0
 label IF_FALSE0
@@ -112,9 +107,8 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push this 0
 push constant 2
-call Bat.setDirection 2
+call bat.setDirection 1
 pop temp 0
 goto IF_END1
 label IF_FALSE1
@@ -142,8 +136,7 @@ not
 if-goto WHILE_END2
 call Keyboard.keyPressed 0
 pop local 0
-push this 0
-call Bat.move 1
+call bat.move 0
 pop temp 0
 push pointer 0
 call PongGame.moveBall 1
@@ -166,8 +159,7 @@ return
 function PongGame.moveBall 5
 push argument 0
 pop pointer 0
-push this 1
-call Ball.move 1
+call ball.move 0
 pop this 2
 push this 2
 push constant 0
@@ -184,17 +176,13 @@ push this 2
 pop this 5
 push constant 0
 pop local 0
-push this 0
-call Bat.getLeft 1
+call bat.getLeft 0
 pop local 1
-push this 0
-call Bat.getRight 1
+call bat.getRight 0
 pop local 2
-push this 1
-call Ball.getLeft 1
+call ball.getLeft 0
 pop local 3
-push this 1
-call Ball.getRight 1
+call ball.getRight 0
 pop local 4
 push this 2
 push constant 4
@@ -244,9 +232,8 @@ push this 6
 push constant 2
 sub
 pop this 6
-push this 0
 push this 6
-call Bat.setWidth 2
+call bat.setWidth 1
 pop temp 0
 push this 4
 push constant 1
@@ -261,9 +248,8 @@ call Output.printInt 1
 pop temp 0
 label IF_FALSE2
 label IF_FALSE1
-push this 1
 push local 0
-call Ball.bounce 2
+call ball.bounce 1
 pop temp 0
 label IF_FALSE0
 push constant 0
