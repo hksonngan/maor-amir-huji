@@ -41,9 +41,45 @@ public class VMWriter {
 	/*
 	 * Writes the VM arithmetic command
 	 * command - the command to write
+	 * isUnary - true if the op is unary. (used for '-')
 	 */
-	public void writeArithmetic(String command) throws IOException{
-		writeLine(command);
+	public void writeArithmetic(Character op,boolean isUnary) throws IOException{
+		switch (op){
+		case '+': {
+			writeLine("add");
+			break;
+		}
+		case '-': {
+			if (isUnary)
+				writeLine("neg");
+			else writeLine("sub");
+			break;
+		}
+		case '&':{
+			writeLine("and");
+			break;
+		}
+		case '|':{
+			writeLine("or");
+			break;
+		}
+		case '<':{
+			writeLine("lt");
+			break;
+		}
+		case '>':{
+			writeLine("gt");
+			break;
+		}
+		case '=':{
+			writeLine("eq");
+			break;
+		}
+		case '~':{
+			writeLine("not");
+			break;
+		}
+		}
 		return;
 	}
 		
