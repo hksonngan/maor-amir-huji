@@ -11,7 +11,10 @@ class Main {
     /** Initializes the Pong game and starts it. */
     function void main() {
         var PongGame game;
+		var Ball ball;
 
+	let ball = Ball.new(1,1,1,1,1,1);	
+		
 	do PongGame.newInstance();
         let game = PongGame.getInstance();
         do game.run();

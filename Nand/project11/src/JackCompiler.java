@@ -69,6 +69,8 @@ public class JackCompiler {
 				new BufferedWriter (new FileWriter(new File(output)));
 
 		CompilationEngine comp = new CompilationEngine(t, writer);
+		
+		System.out.println("Compiling file: " + current.getName());
 		comp.startCompile();
 
 		r.close();		

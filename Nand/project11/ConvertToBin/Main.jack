@@ -86,7 +86,7 @@ class Main {
     }
 	
 	function bool check(){
-		return Main.nextMask(3);
+		return Main.nextMask(3);z
 	}
 	
 }
