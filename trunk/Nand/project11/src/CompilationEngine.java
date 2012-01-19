@@ -15,6 +15,10 @@ public class CompilationEngine {
 	SymbolTable tbl;
 	Keyword _currentSubroutineType;
 	boolean _currentSubroutineRetIsVoid;
+	
+	//if and while counters;
+	int ifIDCounter;
+	int whileIDCounter;
 
 	// handles indentations
 	int depth;
@@ -220,7 +224,8 @@ public class CompilationEngine {
 			compileVarDec();
 		}
 		writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR));
-
+		ifIDCounter=-1;
+		whileIDCounter=-1;
 		
 		// token is on first statement
 		compileStatements();
@@ -262,12 +267,14 @@ public class CompilationEngine {
 				compileLet();
 				break;
 			case WHILE:
+				whileIDCounter++;
 				compileWhile();
 				break;
 			case RETURN:
 				compileReturn();
 				break;
 			case IF:
+				ifIDCounter++;
 				compileIF();
 				break;
 			}
@@ -284,35 +291,43 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void compileIF() throws IOException {
-		printAligned("<ifStatement>");
+		//printAligned("<ifStatement>");
 		depth++;
+		int currentIntNumber = ifIDCounter;
 		// printing if
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
 		tok.advance();
 		expectingSymbol('(');
-		// assert ((tok.TokenType() == TokenType.SYMBOL && tok.symbol() != ')')
-		//		|| (tok.TokenType()!= TokenType.SYMBOL)):"expecting expression";
+		 assert ((tok.TokenType() == TokenType.SYMBOL && tok.symbol() != ')')
+				|| (tok.TokenType()!= TokenType.SYMBOL)):"expecting expression";
 		CompileExpression();
 		expectingSymbol(')');
+		writer.writeIf("IF_TRUE"+currentIntNumber);
+		writer.writeGoto("IF_FALSE" + currentIntNumber);
 		expectingSymbol('{');
+		writer.writeLabel("IF_TRUE"+currentIntNumber);
 		compileStatements();
 		expectingSymbol('}');
+		
 		if (tok.TokenType() == TokenType.KEYWORD)
 			if (tok.keyWord() == Keyword.ELSE)
 			{
-
-				printCurrentTokenAl();
+				writer.writeGoto("IF_END"+currentIntNumber);
+				writer.writeLabel("IF_FALSE"+currentIntNumber);
+				//printCurrentTokenAl();
 				tok.advance();
 				expectingSymbol('{');
 				compileStatements();
 				expectingSymbol('}');
+				writer.writeLabel("IF_END"+currentIntNumber);
 
 			}
-
+			else writer.writeLabel("IF_FALSE"+currentIntNumber);
+		else writer.writeLabel("IF_FALSE"+currentIntNumber);
 
 
 		depth--;
-		printAligned("</ifStatement>");
+	//	printAligned("</ifStatement>");
 
 	}
 	
@@ -350,10 +365,14 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void compileWhile() throws IOException {
-		printAligned("<whileStatement>");
+		//printAligned("<whileStatement>");
 		depth++;
+		
+		int currentWhileID = whileIDCounter;
+		
 		// printing while
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
+		writer.writeLabel("WHILE_EXP"+currentWhileID);
 		tok.advance();
 		expectingSymbol('(');
 		// assert ((tok.TokenType() == TokenType.SYMBOL && tok.symbol() != ')')
@@ -361,13 +380,17 @@ public class CompilationEngine {
 		CompileExpression();
 
 		expectingSymbol(')');
+		writer.writeArithmetic('~',true);
+		writer.writeIf("WHILE_END"+currentWhileID);
 		expectingSymbol('{');
 
 		compileStatements();
 
 		expectingSymbol('}');
+		writer.writeGoto("WHILE_EXP"+currentWhileID);
+		writer.writeLabel("WHILE_END"+currentWhileID);
 		depth--;
-		printAligned("</whileStatement>");
+		//printAligned("</whileStatement>");
 
 	}
 
@@ -618,9 +641,6 @@ public class CompilationEngine {
 			CompileTerm();
 			switch (op)
 			{
-			// TODO: complete this switch
-			// TODO: move the switch to writeArithmetic!!!
-			//TODO: void writeArithmetic( char op)
 			case '*':
 				writer.writeCall("Math.multiply",2);
 				break;
@@ -644,9 +664,6 @@ public class CompilationEngine {
 			currentOp = binaryOps.pop();
 			switch (currentOp)
 			{
-				// TODO: complete this switch
-				// TODO: move the switch to writeArithmetic!!!
-				//TODO: void writeArithmetic( char op)
 				case '*':
 					writer.writeCall("Math.multiply",2);
 					break;
@@ -854,6 +871,7 @@ public class CompilationEngine {
 				break;
 			}
 			case FIELD:{
+				//TODO check if this is good
 				segment = "this";
 				//writer.writePush("this",tbl.indexOf(var));
 				break;
@@ -879,8 +897,8 @@ public class CompilationEngine {
 		Keyword k = tok.keyWord();
 		switch (k){
 		case TRUE:{
-			writer.writePush("constant", 1);
-			writer.writeArithmetic('-', true);
+			writer.writePush("constant", 0);
+			writer.writeArithmetic('~', true);
 			break;
 		}
 		case FALSE:{
@@ -893,13 +911,17 @@ public class CompilationEngine {
 			
 		}
 		case THIS:{
-			//TODO implement this
+			if (_currentSubroutineType != Keyword.CONSTRUCTOR){
+				writer.writePush("argument",0);
+				writer.writePop("pointer",0);				
+			}
+			writer.writePush("pointer",0);
+			return true;
 			
 		}
-		
-		
-		
 		}
+		
+		
 		
 	//TODO remove this at the end and make function void	
 		if (k==Keyword.TRUE || k==Keyword.FALSE || k==Keyword.NULL || k==Keyword.THIS)

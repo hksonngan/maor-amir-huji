@@ -85,10 +85,13 @@ public class JackTokenizer {
 		symbols.put('-', new String("-"));
 		symbols.put('*', new String("*"));
 		symbols.put('/', new String("/"));
-		symbols.put('&', new String("&amp;"));
+		//symbols.put('&', new String("&amp;"));
+		symbols.put('&', new String("&"));
 		symbols.put('|', new String("|"));
-		symbols.put('<', new String("&lt;"));
-		symbols.put('>', new String("&gt;"));
+		//symbols.put('<', new String("&lt;"));
+		symbols.put('<', new String("<"));
+		//symbols.put('>', new String("&gt;"));
+		symbols.put('>', new String(">"));
 		symbols.put('=', new String("="));
 		symbols.put('~', new String("~"));
 	}

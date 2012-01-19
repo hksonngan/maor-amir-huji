@@ -1,0 +1,6 @@
+function PongGame.new 0
+call Screen.clearScreen 0
+pop temp 0
+push constant 50
+pop this 6
+pop this 0
