@@ -1,0 +1,21 @@
+function Main.main 1
+push static 0
+push constant 2
+push constant 3
+call Math.multiply 2
+add
+push local 0
+add
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+function Main.abc 0
+push argument 0
+push argument 0
+add
+push argument 0
+add
+push argument 1
+sub
+return

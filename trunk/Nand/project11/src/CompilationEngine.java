@@ -13,6 +13,8 @@ public class CompilationEngine {
 	String _className;
 	VMWriter writer;
 	SymbolTable tbl;
+	Keyword _currentSubroutineType;
+	boolean _currentSubroutineRetIsVoid;
 
 	// handles indentations
 	int depth;
@@ -70,7 +72,7 @@ public class CompilationEngine {
 	public void compileClass() throws IOException
 	{
 		//print class
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
 		tok.advance();
 		// print class name
 		//printCurrentTokenAl();
@@ -100,7 +102,7 @@ public class CompilationEngine {
 		// tok is ON } of the class
 		assert(tok.TokenType()==TokenType.SYMBOL) :"No class [}] and didnt get symbol";
 		assert(tok.symbol()=='}'):"No class [}]" + "we got: "+ tok.getTokenString();
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
 
 		//check
 		tok.advance();		
@@ -178,48 +180,51 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void CompileSubroutine() throws IOException {
-		writeLine(getAlignedStatement("<subroutineDec>"));
+		//writeLine(getAlignedStatement("<subroutineDec>"));
 		depth++;
 		// printing sub function type word
 		//printCurrentTokenAl();
-		Keyword subType =  tok.keyWord();
+		_currentSubroutineType =  tok.keyWord();
 		tbl.startSubroutine();
 		tok.advance();
 		assert (tok.TokenType()==TokenType.IDENTIFIER ||
 				tok.TokenType()==TokenType.KEYWORD): "expecting type/void subroutine type";
 		
+		if (tok.TokenType()==TokenType.KEYWORD && tok.keyWord() == Keyword.VOID)
+			_currentSubroutineRetIsVoid = true;
+		else _currentSubroutineRetIsVoid = false;
+		
+		
 		//printCurrentTokenAl();
 		tok.advance();
-		// assert (tok.TokenType()==TokenType.IDENTIFIER): "expecting sub name";
+		 assert (tok.TokenType()==TokenType.IDENTIFIER): "expecting sub name";
 		String subName = tok.identifier();
 		//printCurrentTokenAl();
 		tok.advance();
-		// assert (tok.TokenType()==TokenType.SYMBOL): "expecting '(";
+		 assert (tok.TokenType()==TokenType.SYMBOL): "expecting '(";
 		//printCurrentTokenAl();
 
 		compileParameterList();
 		
-		// assert (tok.TokenType()==TokenType.SYMBOL): "expecting ')";
+		 assert (tok.TokenType()==TokenType.SYMBOL): "expecting ')";
 		//printCurrentTokenAl();
 		tok.advance();
 		//printAligned("<subroutineBody>");
 		depth++;
-		// assert(tok.TokenType()==TokenType.SYMBOL): "expecting '{'";
+		 assert(tok.TokenType()==TokenType.SYMBOL): "expecting '{'";
 		//printCurrentTokenAl();
 		tok.advance();
 		while (tok.TokenType() == TokenType.KEYWORD && tok.keyWord()==Keyword.VAR)
 		{
-			// assert(tok.keyWord()==Keyword.VAR) : "expecting var dec";
+			 assert(tok.keyWord()==Keyword.VAR) : "expecting var dec";
 			compileVarDec();
 		}
-		if (subType==Keyword.METHOD)
-			writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR)+1);
-		else
-			writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR));
+		writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR));
+
 		
 		// token is on first statement
 		compileStatements();
-		// assert(tok.TokenType()==TokenType.SYMBOL): "expecting '}'";
+		 assert(tok.TokenType()==TokenType.SYMBOL): "expecting '}'";
 		//printCurrentTokenAl();
 
 		depth--;
@@ -328,8 +333,11 @@ public class CompilationEngine {
 		else
 			if (tok.symbol() != ';')
 				CompileExpression();
-
-		//expectingSymbol(';');
+			else writer.writePush("constant",0);
+			
+		//TODO check return with void and not void
+		
+		expectingSymbol(';');
 		writer.writeReturn();
 		depth--;
 		//printAligned("</returnStatement>");
@@ -376,7 +384,7 @@ public class CompilationEngine {
 		//+ "but we get: " + tok.getTokenString();
 		// assert(tok.symbol()==symbol):"checking " + Character.toString(symbol) +
 		//"but we get: " + tok.getTokenString();
-		printCurrentTokenAl(); // printing symbol
+		//printCurrentTokenAl(); // printing symbol
 		tok.advance();
 	}
 	/**
@@ -386,23 +394,34 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void compileLet() throws IOException {
-		printAligned("<letStatement>");
+		//printAligned("<letStatement>");
 		depth++;
 
+		
+		//TODO implement let with array
+		
+		
 		//printing Let
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
 		tok.advance();
 		// assert(tok.TokenType()==TokenType.IDENTIFIER) : "expecting var name";
-		printCurrentTokenAl();
+		//printCurrentTokenAl();
+		String varName = tok.identifier();
 		tok.advance();
 		// assert(tok.TokenType()==TokenType.SYMBOL) : "expecting '[' or '='";
-		printCurrentTokenAl();
-		if (tok.symbol()=='=')
-		{
+		
+		
+		
+		//printCurrentTokenAl();
+		if (tok.symbol()=='='){
 			tok.advance();
 			CompileExpression();
-		}else
-		{
+			writePushPopVar(varName, false);
+			
+			
+			
+		}
+		else{//TODO implement let with array
 			// already checked that it is symbol
 			// assert(tok.symbol()=='['):"checking '['";
 			tok.advance();
@@ -418,7 +437,7 @@ public class CompilationEngine {
 
 		expectingSymbol(';');
 		depth--;
-		printAligned("</letStatement>");
+		//printAligned("</letStatement>");
 
 	}
 
@@ -444,7 +463,7 @@ public class CompilationEngine {
 		//call class.subName have just been printed
 		// now, ignoring return value
 		writer.writePop("temp", 0);
-		//expectingSymbol(';');
+		expectingSymbol(';');
 		depth--;
 		//printAligned("</doStatement>");
 
@@ -588,33 +607,57 @@ public class CompilationEngine {
 	public void CompileExpression() throws IOException {
 		//printAligned("<expression>");
 		depth++;
-		Stack<Character> binaryOps = new Stack<Character>();
+		//Stack<Character> binaryOps = new Stack<Character>();
+		//Character binaryOp;
 		CompileTerm();
 		// after the last token of term
 		char op  = checkAndPrintOp();
 		while(op!='?')
 		{
-			binaryOps.push(op);
+			//binaryOps.push(op);
 			CompileTerm();
+			switch (op)
+			{
+			// TODO: complete this switch
+			// TODO: move the switch to writeArithmetic!!!
+			//TODO: void writeArithmetic( char op)
+			case '*':
+				writer.writeCall("Math.multiply",2);
+				break;
+			case '/':
+				writer.writeCall("Math.divide",2);
+				break;
+			default:{
+				writer.writeArithmetic(op,false);
+				break;
+			}
+			}
 			op  = checkAndPrintOp();
+			
 		}
 		
+		/*	
+		Character currentOp;
 		// in case of some calculations without brackets
 		while (!binaryOps.isEmpty())
-		{
-			switch (binaryOps.pop())
+		{	
+			currentOp = binaryOps.pop();
+			switch (currentOp)
 			{
 				// TODO: complete this switch
 				// TODO: move the switch to writeArithmetic!!!
 				//TODO: void writeArithmetic( char op)
-				case '+':
-					writer.writeArithmetic("add");
+				case '*':
+					writer.writeCall("Math.multiply",2);
 					break;
-				case '-':
-					writer.writeArithmetic("sub");
+				case '/':
+					writer.writeCall("Math.devide",2);
 					break;
+				default:
+					writer.writeArithmetic(currentOp,false);
 			}
-		}
+			
+		}*/
 
 		depth--;
 		//printAligned("</expression>");
@@ -633,7 +676,7 @@ public class CompilationEngine {
 		if (c=='+' || c== '-' || c== '*' || c=='/' || 
 				c== '&' || c== '|'  || c== '<' || c== '>' || c== '=' )
 		{
-			printCurrentTokenAl();
+			//printCurrentTokenAl();
 			tok.advance();
 			return c;
 		}
@@ -642,19 +685,19 @@ public class CompilationEngine {
 	/**
 	 * the method checks if tok is on unary operator.
 	 * if it is, it prints the operator and advances tok.
-	 * @return true if tok is on unary operator. false otherwise.
+	 * @return the unaryOp char if tok is an unary operator. null otherwise.
 	 * @throws IOException
 	 */
-	private boolean checkAndPrintUnariOp() throws IOException {
-		if (tok.TokenType()!= TokenType.SYMBOL) return false;
+	private Character checkAndPrintUnariOp() throws IOException {
+		if (tok.TokenType()!= TokenType.SYMBOL) return null;
 		char c=tok.symbol();
 		if (c=='~' || c=='-')
 		{
-			printCurrentTokenAl();
+			//printCurrentTokenAl();
 			tok.advance();
-			return true;
+			return c;
 		}
-		return false;
+		return null;
 	}
 
 
@@ -676,7 +719,7 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void CompileTerm() throws IOException {
-		printAligned("<term>");
+		//printAligned("<term>");
 		depth++;
 		TokenType t = tok.TokenType();
 		switch (t)
@@ -693,12 +736,14 @@ public class CompilationEngine {
 		case KEYWORD:
 			if(checkAndPrintKeywordConstant())
 				break;
-			// assert(false) : "should not get here, tok: "+tok.getTokenString();
+			 assert(false) : "should not get here, tok: "+tok.getTokenString();
 			
 		case SYMBOL:
-			if (checkAndPrintUnariOp())
+			Character unaryOp =checkAndPrintUnariOp();
+			if (unaryOp != null)
 			{
 				CompileTerm();
+				writer.writeArithmetic(unaryOp,true);
 				break;
 			}
 
@@ -707,7 +752,7 @@ public class CompilationEngine {
 				//printCurrentTokenAl();
 				tok.advance();
 				CompileExpression();
-				//expectingSymbol(')');
+				expectingSymbol(')');
 				break;
 			}
 			assert(false) : "should not get here, tok: "+tok.getTokenString();
@@ -716,7 +761,6 @@ public class CompilationEngine {
 			//TODO : ASK - is it possible to call a void function here
 			// TODO: if it is - do we need to do something special?
 			String prevIden = new String(tok.identifier());
-
 			tok.advance();
 			if (tok.TokenType() == TokenType.SYMBOL)
 			{
@@ -726,7 +770,7 @@ public class CompilationEngine {
 					{
 					case '[':
 						//print array name
-						printAligned("<identifier> " +prevIden + " </identifier>");
+						//printAligned("<identifier> " +prevIden + " </identifier>");
 						printCurrentTokenAl();
 						tok.advance();
 						CompileExpression();
@@ -746,17 +790,22 @@ public class CompilationEngine {
 				else
 				{
 					//this just an identifier <=> var name
-					printAligned("<identifier> " +prevIden + " </identifier>");
+					//printAligned("<identifier> " +prevIden + " </identifier>");
+					//String varName = tok.identifier();
+					System.out.println("PrevIden is: " + prevIden);
+					writePushPopVar(prevIden,true);
+					
 				}
 				
 			}
-			else
-			{	
+		//	else
+			//{	
 				//this just an identifier <=> var name
 				//printAligned("<identifier> " +prevIden + " </identifier>");
-				String varName = tok.identifier();
+			/*	String varName = tok.identifier();
+				System.out.println("PrevIden is: " + prevIden);
 				// TODO : typeOf(var name) can also be static or field
-				switch (tbl.kindOf(varName))
+				switch (tbl.kindOf(prevIden))
 				{ // TODO: remember that the switch is not done
 					case VAR:
 						writer.writePush("local", tbl.indexOf(varName));
@@ -764,20 +813,60 @@ public class CompilationEngine {
 					case ARG:
 						writer.writePush("argument", tbl.indexOf(varName));
 						break;
-				}
+				}*/
 				
 				
 				// TODO : typeOf(var name) can also be static or field
 				
-			}
+		//	}
 		}
 
 
 
 		depth--;
-		printAligned("</term>");
+		//printAligned("</term>");
 
 	}
+	
+	private void writePushPopVar(String var,boolean isPush) throws IOException{
+		
+		String segment = null;
+		int indexOfVar = tbl.indexOf(var);
+		
+		switch (tbl.kindOf(var))
+		{ // TODO: remember field !!!!!!!
+			case VAR:{
+				segment = "local";
+				//writer.writePush("local", tbl.indexOf(var));
+				break;
+			}
+			case ARG:{
+				//TODO check what happens when current function is a method (need to use argument 0 as this)
+				segment = "argument";
+				if (_currentSubroutineType == Keyword.METHOD)
+					indexOfVar =  tbl.indexOf(var)+1;
+				else indexOfVar =  tbl.indexOf(var);
+				break;
+			}
+			case STATIC:{
+				//writer.writePush("static", tbl.indexOf(var));
+				segment = "static";
+				break;
+			}
+			case FIELD:{
+				segment = "this";
+				//writer.writePush("this",tbl.indexOf(var));
+				break;
+			}
+		}
+		
+		if (isPush)
+			writer.writePush(segment,indexOfVar);
+		else writer.writePop(segment,indexOfVar);
+		
+		
+	}
+	
 	
 	/**
 	 * the method checks if tok is on constant keyword.
@@ -788,9 +877,34 @@ public class CompilationEngine {
 	private boolean checkAndPrintKeywordConstant() throws IOException {
 		// we already know that tok is on symbol
 		Keyword k = tok.keyWord();
+		switch (k){
+		case TRUE:{
+			writer.writePush("constant", 1);
+			writer.writeArithmetic('-', true);
+			break;
+		}
+		case FALSE:{
+			writer.writePush("constant",0);
+			break;
+		}
+		case NULL:{
+			writer.writePush("constant",0);
+			break;
+			
+		}
+		case THIS:{
+			//TODO implement this
+			
+		}
+		
+		
+		
+		}
+		
+	//TODO remove this at the end and make function void	
 		if (k==Keyword.TRUE || k==Keyword.FALSE || k==Keyword.NULL || k==Keyword.THIS)
 		{
-			printCurrentTokenAl();
+			//printCurrentTokenAl();
 			tok.advance();
 			return true;
 		}
@@ -821,11 +935,11 @@ public class CompilationEngine {
 	 */
 	public void compileVarDec() throws IOException {
 		// tok is already on var
-		printAligned("<varDec>");
+		//printAligned("<varDec>");
 		depth++;
 		variablesChain(true);
 		depth--;
-		printAligned("</varDec>");
+	//	printAligned("</varDec>");
 
 	}
 
@@ -838,7 +952,7 @@ public class CompilationEngine {
 	 * @throws IOException
 	 */
 	public void compileParameterList() throws IOException {
-		printAligned("<parameterList>");
+		//printAligned("<parameterList>");
 		depth++;
 		tok.advance();
 		if (tok.TokenType()!=TokenType.SYMBOL) {
@@ -861,7 +975,7 @@ public class CompilationEngine {
 
 		}
 		depth--;
-		printAligned("</parameterList>");
+		//printAligned("</parameterList>");
 
 	}
 
@@ -889,17 +1003,17 @@ public class CompilationEngine {
 	 */
 	public void startCompile() throws IOException
 	{
-		writeLine(getAlignedStatement("<class>"));
+		//writeLine(getAlignedStatement("<class>"));
 		depth++;
 		// moves token to the first word- class keyword
 		tok.advance();
-		// assert(tok.getTokenString().equals("class")):"file dont have class";
+		 assert(tok.getTokenString().equals("class")):"file dont have class";
 		if (tok.TokenType()==TokenType.KEYWORD)
 			if (tok.keyWord()==Keyword.CLASS)
 				compileClass();
 
 		depth--;
-		writeLine(getAlignedStatement("</class>"));
+		//writeLine(getAlignedStatement("</class>"));
 
 	}
 	/**
