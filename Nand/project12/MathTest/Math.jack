@@ -24,11 +24,14 @@ class Math {
 	function void initTwoToTheArray(){
 		
 		var int index;
+		var int number;
 		let index = 1;
+		let number = 1;
 		let twoToThe[0] = 1;	
 		while (index < 16)
 		{
-			let twoToThe[index] = twoToThe[index-1]+twoToThe[index-1];
+			let number = number+number;
+			let twoToThe[index] = number;
 			let index = index + 1;
 		}
 		return;
@@ -37,7 +40,7 @@ class Math {
 	
     /** Returns the absolute value of x. */
     function int abs(int x) {
-		if ((x > 0) | (x=0))
+		if (~(x<0))
 		{
 			return x;
 		}
@@ -46,6 +49,8 @@ class Math {
 		}
     }
 
+	
+	////////////////////////////////////////////////////////////////////////////////
 	/**  Returns true if the j-th bit of the integer x  is 1 and false otherwise */
 	function boolean bit(int x , int j)
 	{
@@ -54,48 +59,75 @@ class Math {
 		
 		let numFromArray = twoToThe[j];
 		let bitRes = x & numFromArray;	
-			
-		if (bitRes = numFromArray){
+						
+		/*if (bitRes = numFromArray){
 			return true;
 		}
 		else{
 			return false;
-		}
+		}*/
+		
+		return ((x & numFromArray) > 0);
 	}
-	
+	/////////////////////////////////////////////////////////////////////////////////
 	
     /** Returns the product of x and y. */
     function int multiply(int x, int y) {
-		var int j,shiftedX,sum;
-		var int numOfBits;		
+		var int j,shiftedX,sum,endWhileFlag;
 		var int shorterNum,absX,absY;
 		var bool sign;
 				
-
-
-		if ((x = 0) | (y=0)){
+		if (x = 0){
 			return 0;
 		}
-
+		else {
+			if (y=0) {
+				return 0;
+			}
+		}
+	
 		//decide on the sign of the result
 		if (x<0){
 			if (y>0){
-				let sign = false;
+				let sign = true;
 			}
 			else{
-				let sign = true;
+				let sign = false;
 			}			
 		}
 		else{
 			if (y<0){
-				let sign = false;
+				let sign = true;
 			}
 			else{
-				let sign = true;
+				let sign = false;
 			}
 		}
 				
-				
+		
+/*		let local4 = (((x<0) & (y>0)) | ((x>0) & (y<0)));
+		let x = Math.abs(x);
+		let y = Math.abs(y);
+		if (x<y){
+			let local1 = x;
+			let x=y;
+			let y = local1;
+		}
+		while(local2<y){
+			if ((static0[local3] & y) > 0){
+				local0 = local0+x;
+				local2 = local2+static0[local3];			
+			}
+			let x = x+ x;
+			local3 = local3 + 1;		
+			}	
+		}
+		
+		if (local4){
+			local0 = -local0;
+		}
+		return local0;*/
+		
 		//check who has more bits		
 		let absX = Math.abs(x);
 		let absY = Math.abs(y);		
@@ -108,57 +140,51 @@ class Math {
 			let shiftedX = absX;
 			let shorterNum = absY;
 		}
-		
-		//get the length of shorter number
-		let j=15;
-		while ((j >0) | (j=0)){
-			if (Math.bit(shorterNum,j) = true){
-				let numOfBits = j;
-				let j=-1;
-			}
-			else{
-				let j = j-1;
-			}
-		}
 
 		//calculating the multiplication
 		let sum=0;
 		let j = 0;
-		while (j < (numOfBits+1))
+		let endWhileFlag = 0;
+		while (endWhileFlag < shorterNum)
 		{
-			if (Math.bit(shorterNum,j) = true)
+			if ((shorterNum & twoToThe[j]) > 0)
 			{
 				let sum = sum + shiftedX;
+				let endWhileFlag = endWhileFlag + twoToThe[j];
 			}
 			let shiftedX = shiftedX+shiftedX;
 			let j = j + 1;
 		}
-		
-		//return result based on the sign
-		if (sign = false){	
-			return -sum;
-		}
-		else{
-			return sum;
-		}
+	
+		if (sign){
+			let sum = -sum;
+		}	
+		return sum;
     }
 
 
 	/** Returns the integer part of x/y where both are positive */
 	function int calcDivide(int x,int y){
 		var int q;
+		var int temp;
 		
-		//case y was overflow
-		if ((y<0) | (y>x)){
-		  return 0;
+		//case y was overflow	
+		if (y<0){
+			return 0;
+		}
+		else {
+			if (y>x){
+				return 0;
+		}
 		}
 		
-		let q = Math.calcDivide(x,2*y);
-		if ((x - (2*q*y)) < y){
-			return 2*q;
+		let q = Math.calcDivide(x,y+y);
+		let temp = q*y;
+		if ((x - (temp+temp)) < y){
+			return q+q;
 		}
 		else{
-			return 2*q+1;
+			return q+q+1;
 		}
 		
 	}
