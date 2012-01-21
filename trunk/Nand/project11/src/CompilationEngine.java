@@ -34,32 +34,23 @@ public class CompilationEngine {
 	{
 		tok.advance();
 		_className = tok.identifier();
-		assert(tok.TokenType()==TokenType.IDENTIFIER) : "Not class name";
 		tok.advance();
-		assert(tok.TokenType()==TokenType.SYMBOL) :"No class [{] and didnt get symbol";
-		assert(tok.symbol()=='{'):"No class [{]" + "we got: "+ tok.getTokenString();
 		tok.advance();
-		assert(tok.TokenType() == TokenType.KEYWORD) : "dec-var/ subrut";
 		// iterating through class static and field declarations and compiles 
 		// the declaration with CompileClassVarDec
 		while (tok.keyWord()==Keyword.STATIC || tok.keyWord()==Keyword.FIELD)
 		{
-			assert(tok.TokenType() == TokenType.KEYWORD) : "dec-var/ subrut";
 			variablesChain(false);
 		}
-		assert(tok.TokenType() == TokenType.KEYWORD) : "expecting subroutine" +
-		", we got: " + tok.getTokenString();
+		//expecting subroutine
 		// iterating over all functions, methods and ctors in a class
 		while(isSubroutine())
 		{
 			CompileSubroutine();
 		}
 		// tok is ON } of the class
-		assert(tok.TokenType()==TokenType.SYMBOL) :"No class [}] and didnt get symbol. We get " + tok.getTokenString();
-		assert(tok.symbol()=='}'):"No class [}]" + "we got: "+ tok.getTokenString();
 
 		tok.advance();		
-		//if (!tok.hasMoreCommands()) System.out.println("EOF reached!");
 		
 	}
 
@@ -76,7 +67,6 @@ public class CompilationEngine {
 		Kind kind = Kind.VAR;
 		if (!isVar)
 		{
-			//assert (kStr.equals("static") || kStr.equals("field")) : "static or field expected";
 			if (varType == Keyword.STATIC)
 				kind = Kind.STATIC;
 			else
@@ -84,30 +74,26 @@ public class CompilationEngine {
 		}
 		
 		tok.advance();
-		// assert(tok.TokenType() == TokenType.KEYWORD || tok.TokenType() == TokenType.IDENTIFIER)
-		//: "expecting variable type or class name";
+		//expecting variable type or class name";
 		String type = tok.identifier();
 		tok.advance();
-		// assert(tok.TokenType() == TokenType.IDENTIFIER): 
-		//	"expecting variable name we got: " + tok.getTokenString();
 		tbl.define(tok.identifier(), type, kind);
 		tok.advance();
-		// assert (tok.TokenType()==TokenType.SYMBOL): "expecting next variable ',' or ';'";
+		// expecting next variable ',' or ';'
 		while (tok.symbol()==',')
 		{
 			tok.advance();
-			// assert(tok.TokenType() == TokenType.IDENTIFIER): "expecting variable name";
+			//expecting variable name
 			tbl.define(tok.identifier(), type, kind);
 			tok.advance();
-			// assert (tok.TokenType()==TokenType.SYMBOL): "expecting next variable ',' or ';'";
+			//expecting next variable ',' or ';'
 		}
-		// assert (tok.symbol()==';'): "expecting ';'";
-		// printing ';'
+		//expecting next variable ',' or ';'
 		tok.advance();
 	}
 
 	/**
-	 * this method is called from compileClass after compiling class vaiables.
+	 * this method is called from compileClass after compiling class variables.
 	 * assuming tok is on the subroutine's keyword (before its name).
 	 * @throws IOException
 	 */
@@ -117,31 +103,27 @@ public class CompilationEngine {
 
 		tbl.startSubroutine();
 		tok.advance();
-		assert (tok.TokenType()==TokenType.IDENTIFIER ||
-				tok.TokenType()==TokenType.KEYWORD): "expecting type/void subroutine type";
+		//"expecting type/void subroutine type"
 		
 		if (tok.TokenType()==TokenType.KEYWORD && tok.keyWord() == Keyword.VOID)
 			_currentSubroutineRetIsVoid = true;
 		else _currentSubroutineRetIsVoid = false;
 		
 		tok.advance();
-		 assert (tok.TokenType()==TokenType.IDENTIFIER): "expecting sub name";
+		//expecting sub name"
 		String subName = tok.identifier();
-		
-		System.out.println("compiling subroutine: " + subName);
-		
 		tok.advance();
-		 assert (tok.TokenType()==TokenType.SYMBOL): "expecting '(";
+		//"expecting '('
 
 		compileParameterList();
 		
-		 assert (tok.TokenType()==TokenType.SYMBOL): "expecting ')";
+		//"expecting ')"
 		tok.advance();
-		 assert(tok.TokenType()==TokenType.SYMBOL): "expecting '{'";
+		//expecting '{'"
 		tok.advance();
 		while (tok.TokenType() == TokenType.KEYWORD && tok.keyWord()==Keyword.VAR)
 		{
-			 assert(tok.keyWord()==Keyword.VAR) : "expecting var dec";
+			 //expecting var declaration
 			 variablesChain(true);
 		}
 		writer.writeFunction(_className + "." + subName, tbl.varCount(Kind.VAR));
@@ -160,7 +142,7 @@ public class CompilationEngine {
 		
 		// token is on first statement
 		compileStatements();
-		 assert(tok.TokenType()==TokenType.SYMBOL): "expecting '}'";
+		// "expecting '}'";
 		tok.advance();
 		// is NOW ON } that closes the subroutine
 	}
@@ -213,8 +195,6 @@ public class CompilationEngine {
 		int currentIntNumber = ifIDCounter;
 		tok.advance();
 		expectingSymbol('(');
-		 assert ((tok.TokenType() == TokenType.SYMBOL && tok.symbol() != ')')
-				|| (tok.TokenType()!= TokenType.SYMBOL)):"expecting expression";
 		CompileExpression();
 		expectingSymbol(')');
 		writer.writeIf("IF_TRUE"+currentIntNumber);
@@ -296,7 +276,7 @@ public class CompilationEngine {
 		//+ "but we get: " + tok.getTokenString();
 		// assert(tok.symbol()==symbol):"checking " + Character.toString(symbol) +
 		//"but we get: " + tok.getTokenString();
-		//printCurrentTokenAl(); // printing symbol
+		//printCurrentTokenAl(); // printing symbol (only for XML)
 		tok.advance();
 	}
 	/**
@@ -307,10 +287,10 @@ public class CompilationEngine {
 	 */
 	public void compileLet() throws IOException {
 		tok.advance();
-		// assert(tok.TokenType()==TokenType.IDENTIFIER) : "expecting var name";
+		//expecting var name
 		String varName = tok.identifier();
 		tok.advance();
-		// assert(tok.TokenType()==TokenType.SYMBOL) : "expecting '[' or '='";
+		//expecting '[' or '='"
 			
 		//case of assignment to variable
 		if (tok.symbol()=='='){
@@ -349,7 +329,7 @@ public class CompilationEngine {
 	 */
 	public void compileDo() throws IOException {
 		tok.advance();
-		 assert(tok.TokenType()==TokenType.IDENTIFIER) : "expecting a class name / sub name";
+		//"expecting a class name / sub name"
 		// saving the identifier's call and peaking ahead for the subroutineCall
 		String name = new String(tok.identifier());
 		tok.advance();
@@ -384,10 +364,9 @@ public class CompilationEngine {
 			break;
 		case '.':
 			tok.advance();
-			assert(tok.TokenType()==TokenType.IDENTIFIER) : "expecting a sub name";
+			// "expecting a sub name";
 			String subName = tok.identifier();
 			tok.advance();
-			assert(tok.TokenType() == TokenType.SYMBOL) : "expecting '('";
 			tok.advance();
 			if (tbl.typeOf(name) != null){
 				writePushPopVar(name, true);
@@ -400,8 +379,7 @@ public class CompilationEngine {
 			}			
 			break;
 		}
-		assert (nArgs>=0 && callSub!=null) 
-		: "nArgs must be non-negative, and callSun must be not null";
+		//"nArgs must be non-negative, and callSun must be not null"
 		writer.writeCall(callSub, nArgs);
 		expectingSymbol(')');		
 	}
@@ -437,11 +415,10 @@ public class CompilationEngine {
 	 */
 	private int help_complileList() throws IOException
 	{
-		// according to the assumptions, we have at least one arg
+		// according to the assumptions, we have at least one argument
 		int counter =1;
 		CompileExpression();
-		assert(tok.TokenType() == TokenType.SYMBOL) :
-		"expecting ')' or ',' or'(' , but we got: " + tok.getTokenString();
+		//"expecting ')' or ',' or'(' 
 		while (tok.symbol()==','){
 			counter++;
 			tok.advance();
@@ -572,7 +549,7 @@ public class CompilationEngine {
 				expectingSymbol(')');
 				break;
 			}
-			assert(false) : "should not get here, tok: "+tok.getTokenString();
+			//assert(false) : "should not get here"
 			break;
 		case IDENTIFIER:
 			String prevIden = new String(tok.identifier());
@@ -608,6 +585,7 @@ public class CompilationEngine {
 	
 	/**
 	 * used to write the command to push or pop a variable
+	 * very useful in Let statements
 	 * @param var the variable
 	 * @param isPush true if we need to push. False otherwise.
 	 * @throws IOException
@@ -741,12 +719,10 @@ public class CompilationEngine {
 	 */
 	private void help_ParameterList() throws IOException
 	{
-		// assert (tok.TokenType()==TokenType.KEYWORD
-		//		|| tok.TokenType()==TokenType.IDENTIFIER
-		//		) : "expecting type / class, we got: "+ tok.getTokenString();
+
 		String type = tok.identifier();
 		tok.advance();
-		// assert (tok.TokenType()==TokenType.IDENTIFIER) : "expecting param name";
+		//"expecting parameter name";
 		tbl.define(tok.identifier(), type, Kind.ARG);
 		tok.advance();
 	}
@@ -759,7 +735,7 @@ public class CompilationEngine {
 	{
 		// moves token to the first word- class keyword
 		tok.advance();
-		 assert(tok.getTokenString().equals("class")):"file dont have class";
+		 //assert(tok.getTokenString().equals("class")):"file dont have class";
 		if (tok.TokenType()==TokenType.KEYWORD)
 			if (tok.keyWord()==Keyword.CLASS)
 				compileClass();
