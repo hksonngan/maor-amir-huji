@@ -1,0 +1,227 @@
+
+/**
+ * The Game class implements the 4-in-a-row game.
+ * Use the arrow keys to move the square.
+ * Use 'space' to choose to the column.
+ * Use 'q' to quit.
+ */
+class Game {
+
+	field Piece movingPlayer;
+	field Board b;
+	
+    
+	/** Constructs a new Game. */
+    constructor Game new() {
+		let movingPlayer = Piece.new(false,true);
+		let b = Board.new();
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+	// updated
+    method void dispose() {
+        do b.dispose();
+		do movingPlayer.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+	
+
+    /** Starts the game */
+    method void run() {
+        var char key;
+        var boolean exit,foundWinner;		
+		var Array res;
+		var boolean player,gameEnded;
+        var int  playerXPos;
+		
+		let playerXPos=6;
+		let exit = false;
+		let gameEnded = false;
+		let player = true;
+		
+		do Game.drawGrid();
+		do drawScoreBoard();		
+		do movingPlayer.drawPiece(playerXPos,0);
+		
+    	//listen to key pressing as long as the user did not exit	
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+			
+			//case of 'Q'
+            if (key = 81) {
+                let exit = true;
+				do Screen.clearScreen();
+				do Output.moveCursor(10,25);
+				do Output.printString("GoodBye!!!");
+				
+            }
+			
+			//case of 'R'
+			if (key = 82) {
+				if (gameEnded)
+				{				
+					do Screen.clearScreen();				
+					do movingPlayer.dispose();
+					do b.dispose();
+					
+					let b = Board.new();					
+					let gameEnded = false;
+					let player = true;
+					let playerXPos=6;
+					
+					do Game.drawGrid();
+					do drawScoreBoard();
+					let movingPlayer = Piece.new(false,true);
+					do movingPlayer.drawPiece(playerXPos,0);				
+				}
+			}
+						
+			//case of 'space'
+			if (key = 32) {
+				if (~gameEnded)
+				{
+				do Output.println();
+				if (b.putPlayer(playerXPos))
+				{
+					do movingPlayer.changeType();
+					let res = b.checkScore();
+					if (~(res[0]<0))
+					{
+						let foundWinner = b.getWinner();
+						do Game.winLine(res,foundWinner);
+						if (foundWinner)
+						{
+							do Output.moveCursor(5,2);
+							do Output.printString("Black Won!        ");
+						}
+						else
+						{
+							do Output.moveCursor(5,2);
+							do Output.printString("White Won!        ");
+						}
+						do Output.moveCursor(7,2);
+						do Output.printString("To play again press 'R'");
+						let gameEnded = true;
+					}
+					else{
+						do Output.moveCursor(5,2);
+						let player = ~player;
+						if (player)
+						{
+							do Output.printString("White");
+						}
+						else
+						{
+							do Output.printString("Black");
+						}
+					
+					}
+					do res.dispose();
+				}
+				}
+			}
+			
+			//case of left arrow key
+            if (key = 130) {
+				if (~(playerXPos = 0))
+			{
+				do movingPlayer.movePiece(playerXPos-1,0);
+				let playerXPos = playerXPos-1;
+			}
+            }
+			//case of right arrow key
+            if (key = 132) {
+				if (~(playerXPos = 6))
+		   {
+				do movingPlayer.movePiece(playerXPos+1,0);
+				let playerXPos = playerXPos+1;
+			}
+            }
+			
+			//waits until the player release the key
+			while (~(key = 0))
+			{
+				let key = Keyboard.keyPressed();
+			}
+        }
+		
+        return;
+	}
+	
+	/**
+	 * a function for drawing the game grid on the screen.
+	 */	
+	function void drawGrid()
+	{
+		
+		var int y_offset;
+		var int x_offset;
+		var int i;
+		let i = 0;
+		let y_offset = 27;
+		let x_offset = 256+28;
+		do Screen.setColor(true);
+		while(i<7)
+		{
+			do Screen.drawLine(256+28, ((i*28) + y_offset), 480 ,  (i*28) + y_offset);
+			let i = i + 1;	
+		}	
+		
+		let i =0;	
+		while(i<8)
+		{
+			do Screen.drawLine(( x_offset + (i*28)) , y_offset ,(x_offset+(i*28)) , 223-56 + y_offset);
+			let i = i + 1;
+		}		
+		return;
+	}
+	
+	/**
+	 * a function for drawing the score board on the screen.
+	 */
+	method void drawScoreBoard()
+	{
+		do Output.moveCursor(2,2);
+		do Output.printString("Play our 4-in-a-row game!");
+		do Output.println();
+		
+		do Output.printString("  - - - - - - - - - - - - -");
+		do Output.println();
+		
+		do Output.moveCursor(5,2);
+		do Output.printString("White player turn");
+		
+		do Output.moveCursor(12,2);
+		do Output.printString("Keys:");
+		
+		do Output.moveCursor(14,2);
+		do Output.printString("Move - 'left/right arrow'");
+		
+		do Output.moveCursor(16,2);
+		do Output.printString("Release piece - 'space'");
+		
+		do Output.moveCursor(20,2);
+		do Output.printString("Press 'Q' to quit");
+		return;
+	}
+	
+	/**
+	 * Draws a line in case of a win.
+	 * res - and array that saves the winning data
+	 * winner - the player who won the game.
+	 */
+	function void winLine( Array res, boolean winner)
+	{
+		do Screen.setColor(~winner);
+		//do Screen.setColor(true);
+		do Screen.drawLine((298+(res[0]*28))-1,(41+(res[1]*28))-1,(298+(res[2]*28))-1,(41+(res[3]*28))-1);
+		do Screen.drawLine((298+(res[0]*28))+1,(41+(res[1]*28))+1,(298+(res[2]*28))+1,(41+(res[3]*28))+1);
+		
+		return;
+	}
+
+}
+
+

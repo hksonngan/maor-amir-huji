@@ -44,6 +44,24 @@ push constant 0
 pop local 1
 push constant 0
 pop local 2
+push constant 6
+call String.new 1
+push constant 100
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 102
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 103
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+call Output.println 0
+pop temp 0
 label WHILE_EXP0
 push local 0
 push constant 1
@@ -346,6 +364,34 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 0
+push constant 1
+add
+push static 0
+add
+pop pointer 1
+push that 0
+push local 0
+push constant 2
+add
+eq
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
+push local 1
+push constant 1
+add
+push static 0
+add
+push local 1
+push constant 2
+add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto IF_END8
+label IF_FALSE8
 push local 1
 push constant 1
 add
@@ -362,6 +408,7 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+label IF_END8
 push local 0
 push constant 1
 add

@@ -13,6 +13,7 @@ class Memory {
 	static int heapLength;
 	
 	
+	
     /** Initializes memory parameters. */
     function void init() {
 		let memory = 0;
@@ -42,7 +43,6 @@ class Memory {
 		let currentSegmentAddress = 2048;
 		let firstSegmentAddress = 0;
 		let accumulateSize = 0;
-				
 		while (~(memory[currentSegmentAddress+1]) = (currentSegmentAddress+2)){
 			if (memory[currentSegmentAddress] > 0){
 				if (firstSegmentAddress = 0){
@@ -93,7 +93,7 @@ class Memory {
 		}
 		let segmentNotFound = true;
 		let currentSegmentAddress = 2048;
-		let exitWhile = (~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2)));
+		let exitWhile = ~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2));
 		//while we havent reached the last segment
 		while (segmentNotFound & exitWhile){
 				if (memory[currentSegmentAddress] > (size)){
@@ -101,7 +101,7 @@ class Memory {
 				}
 				else{
 					let currentSegmentAddress = memory[currentSegmentAddress+1];
-					let exitWhile = (~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2)));
+					let exitWhile = ~(memory[currentSegmentAddress+1] = (currentSegmentAddress+2));
 				}
 		}
 		
@@ -109,7 +109,8 @@ class Memory {
 		{
 			let segmentNotFound = false;
 		}
-				
+		
+		
 		if (segmentNotFound){
 			let currentSegmentAddress = Memory.defragHeap(size);
 			if (~(currentSegmentAddress = -1)){
@@ -125,21 +126,14 @@ class Memory {
 			if ((size + addressToRet) > 16379){
 				do Sys.error(6);
 			}
-		
 			if (remainSize > 2){
 				let nextSegmentAddress = currentSegmentAddress + 2 + size;
 				let memory[nextSegmentAddress] = remainSize;
-				if (memory[currentSegmentAddress+1] = (currentSegmentAddress+2)){
-					let memory[nextSegmentAddress+1] = nextSegmentAddress+2;
-				}
-				else {	
-					let memory[nextSegmentAddress+1] = memory[currentSegmentAddress+1];
-					}				
+				let memory[nextSegmentAddress+1] = memory[currentSegmentAddress+1];
 				let memory[currentSegmentAddress+1] = nextSegmentAddress;
+				return addressToRet;
 			}
-			return addressToRet;
 		}
-
 		return -1;	
 	}
 
