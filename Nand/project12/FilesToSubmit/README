@@ -1,0 +1,26 @@
+amirlaz, maord
+===============================================================================
+Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
+Maor Dayan, ID 300564770, maor.dayan@mail.huji.ac.il
+===============================================================================
+
+                           Project 12: The Operating System
+                           --------------------------------
+  
+
+Submitted Files
+---------------
+README              
+Array.jack - the Array class implementation
+Keyboard.jack  - the Keyboard class implementation
+Math.jack  - the Math class implementation
+Memory.jack - the Memory class implementation
+Output.jack - the Output class implementation
+Screen.jack - the Screen class implementation
+Sys.jack - the Sys class implementation
+
+
+
+Remarks
+-------
+* None

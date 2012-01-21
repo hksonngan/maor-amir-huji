@@ -1,0 +1,199 @@
+class Check{
+
+static int a,b;
+field int c,d;
+
+static Array e,f;
+field Array g,h;
+
+static String i,j;
+field String k,l;
+
+
+constructor Check new(int aa,bool bb, Array ccc, String d)
+{
+	var int ff;
+	var String jj;
+	var Array dd;
+	
+
+	let e[a+3] = b;
+	let b = f[2+3+a]*2;
+	let f[4] = c;
+	let d = e[b+15]/2;
+	
+	let g[3] = a;
+	let b = g[3];
+	
+	let h[15] = c;
+	let g[a+b+2] = h[15];
+	
+	
+	let b[4] = e[a+3];
+	let b[2] = aa;
+	let e[0] = b[2];
+	let g[2] = b[2+1+a];
+	
+	let aa = 2;
+	let bb = true;
+	let bb = false;
+	let ccc[2] = a[2];
+	let b = ccc[1];
+	
+	
+	
+	let dd[2] = a;
+	let a = dd[2];
+	
+	let d = String.new(4);
+	let i = String.new(10);
+	let k = String.new(4);
+	let jj = String.new(50);
+	
+	do d.appendChar(10);
+	do i.appendChar(a);
+	do k.appendChar(3);
+	do jj.appendChar(ff);
+	
+	
+	
+	do check1(aa,bb,d);
+	let a = check1(a,e,j);
+	let a = check1(c,g,l);
+	let b = check1(aa,c,bb);
+	
+	do Check.check2(d,h,l);
+	
+	do check4();
+	do check1(a,e,j);
+	do check6();
+
+	return this;
+}
+
+
+method int check1(int aaa, Array bbbb,String cccc){
+	var char aa;
+	var bool bb;
+	var String cc;
+	var int a3;
+	
+	let aaa = a+c;
+	let a3 = a3 + a +c;
+	let a = c;
+	let c = a;
+	
+	let e[a+3] = b;
+	let b = f[2+3+a]*2;
+	let f[4] = c;
+	let d = e[b+15]/2;
+	
+	let g[3] = a;
+	let b = g[3];
+	
+	let h[15] = c;
+	let g[a+b+2] = h[15];
+	
+	
+	let b[4] = e[a+3];
+	let b[2] = aa;
+	let e[0] = b[2];
+	let g[2] = b[2+1+a];
+	
+	do l.appendChar(31);
+	do i.appendChar(10);
+	do cccc.appendChar(41);
+	do cc.appendChar(10);
+	
+	let c = String.new(10);
+	
+	do Check.check2(aaa,bbbb,cccc);
+	do Check.check2(aa,bb,cc);
+	do Check.check2(a,e,i);
+	do Check.check2(c,g,k);
+	
+	let aaa = Check.check3();
+	do Check.check3();
+	
+	do check4();
+	
+	let cccc = Check.check5();
+	let cc = Check.check5();
+	let j = Check.check5();
+	let i = Check.check5();
+	
+	do check6();
+	
+	
+	return c;
+
+}
+
+
+function void check2(int abc,Array bba , String cca){
+	var int a1;
+	var Array b1;
+	var String c1;
+	
+	let a1 = a;
+	let a1 = b;
+	let a = b;
+	let a = b+a;
+	let a = a1;
+	let b = a1+a;
+	
+	let abc = a;
+	
+	let bba[41] = a+a1;
+	
+	
+	
+	do cca.appendChar(14);
+	do cca.appendChar(a);
+	
+	let e[3] = 10;
+	
+	
+	do j.appendChar(11);
+	
+	do c1.appendChar(41);
+	do c1.dispose();
+	
+	let abc = Check.check3();
+	do Check.check3();
+	
+	do Check.check5();
+	
+	let cca = Check.check5();
+	let c1 = Check.check5();
+	let j = Check.check5();
+	
+	
+	
+	return;
+	
+	
+	
+}
+
+method void check4(){
+	return;
+}	
+
+
+function int check3(){
+
+	return 10;
+}
+
+function String check5(){
+	return null;
+}
+
+method Check check6(){
+	return this;
+}
+
+
+
+}

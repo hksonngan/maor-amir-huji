@@ -1,0 +1,316 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/12/Screen.jack
+
+/**
+ * Graphic screen library.
+ */
+class Screen {
+	static Array memory;
+	static bool currentColor;
+	static Array powerOfTwo;
+	
+    /** Initializes the Screen. */
+    function void init() {
+		let currentColor = true;
+		let memory = 16384;
+		let powerOfTwo = Array.new(16);
+		do Screen.initPowerOfTwoArray();
+		return;
+    }
+
+    /** Erases the whole screen. */
+    function void clearScreen() {
+		var int currentIndex;
+		
+		let currentIndex = 16384;
+		while (currentIndex < 24576){
+			do Memory.poke(currentIndex,0);
+			let currentIndex = currentIndex + 1;
+		}
+		return;
+    }
+	
+	/** Initialize the array of power of 2 multiplications */
+	function void initPowerOfTwoArray(){
+		
+		var int index;
+		let index = 1;
+		let powerOfTwo[0] = 1;	
+		while (index < 16)
+		{
+			let powerOfTwo[index] = powerOfTwo[index-1]+powerOfTwo[index-1];
+			let index = index + 1;
+		}
+		return;
+	}
+	
+
+    /** Sets the color to be used in further draw commands
+     *  where white = false, black = true. */
+    function void setColor(boolean b) {
+		let currentColor = b;
+		return;
+    }
+	
+	
+    /** Draws the (x, y) pixel. */
+    function void drawPixel(int x, int y) {
+		
+		var int pixelAddress;
+		var int pixelPositionInBit;
+		var int screenData;
+		
+		if (x < 0 | x > 511){
+			do Sys.error(7);
+			return;
+		}
+		
+		if (y <0 | y > 255){
+			do Sys.error(7);
+			return;
+		}
+		
+		let pixelAddress = (y*32) + (x/16) ;
+		let pixelPositionInBit =  x & 15; 
+		let screenData = memory[pixelAddress];
+		if (currentColor){
+			let memory[pixelAddress] =  screenData | powerOfTwo[pixelPositionInBit];
+		}
+		else{
+			let memory[pixelAddress] = screenData & ((~0) - powerOfTwo[pixelPositionInBit]);
+		}
+		return;	
+    }
+
+	/** Draws a horizontal line from (x1,y) to (x2,y) */
+	function void drawHorizontalLine(int x1,int x2, int y){
+		var int bigger,smaller;
+		var int addressToChange;
+		
+		if (x1 < x2){
+			let bigger = x2+1;
+			let smaller = x1;
+		}
+		else{
+			let bigger = x1+1;
+			let smaller = x2;
+		}
+			
+		while (~((smaller & 15) = 0) & (smaller < bigger)){
+			do Screen.drawPixel(smaller,y);
+			let smaller = smaller + 1;
+		}
+		
+		let addressToChange = (y*32) + (smaller/16);
+
+	
+		while (smaller < (bigger-16)){
+			
+			if (currentColor){
+				let memory[addressToChange] = -1;
+			}
+			else {
+				let memory[addressToChange] = 0;
+			}
+			let addressToChange = addressToChange + 1;
+			let smaller = smaller + 16;
+		}
+		while (smaller < bigger){
+			do Screen.drawPixel(smaller,y);
+			let smaller = smaller + 1;
+
+		}		
+		
+		
+		return;
+	
+	}
+	/** Draws a horizontal line from (x,y1) to (x,y2) */
+	function void drawVerticalLine(int x,int y1, int y2){
+		var int bigger,smaller;
+		
+		if (y1 < y2){
+			let bigger = y2+1;
+			let smaller = y1;
+		}
+		else{
+			let bigger = y1+1;
+			let smaller = y2;
+		}
+		
+		while (smaller < bigger){
+			do Screen.drawPixel(x,smaller);
+			let smaller = smaller + 1;
+		}
+		return;
+	}
+	
+	
+    /** Draws a line from pixel (x1, y1) to (x2, y2). */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+		var int dx,dy,absDx,absDy,a,b,absA,absB;
+		var int stepX,stepY;
+		var int adyMinusbdx;
+				
+		//checking the input
+		if (x1 < 0 | x1 > 511){
+			do Sys.error(8);
+			return;
+		}
+		
+		if (x2 < 0 | x2 > 511){
+			do Sys.error(8);
+			return;
+		}
+		
+		if (y1 <0 | y1 > 255){
+			do Sys.error(8);
+			return;
+		}
+		
+		if (y2 <0 | y2 > 255){
+			do Sys.error(8);
+			return;
+		}
+		
+		if (x1=x2 & y1=y2){
+			do Screen.drawPixel(x1,y1);
+			return;
+		}
+		
+		let adyMinusbdx = 0;
+		let dx = x2-x1;
+		let dy = y2-y1;
+		let absDx = Math.abs(dx);
+		let absDy = Math.abs(dy);
+		
+		if (dx = 0){
+			do Screen.drawVerticalLine(x1,y1,y2);
+			return;
+		}
+		
+		if (dy = 0){
+			do Screen.drawHorizontalLine(x1,x2,y1);
+		}
+		
+		if (dx > 0){
+			let stepX = 1;
+		}
+		else{
+			let stepX = -1;
+			}
+		
+		if (dy > 0){
+			let stepY = 1;
+		}
+		else{
+			let stepY = -1;
+		}
+		
+		let a = 0;
+		let absA = 0;
+		let b = 0;
+		let absB = 0;
+		
+		while (~(absA>absDx) & ~(absB > absDy)){
+			do Screen.drawPixel(x1+a,y1+b);
+			if (adyMinusbdx < 0){
+				let a = a + stepX;
+				let absA = Math.abs(a);
+				let adyMinusbdx = adyMinusbdx + absDy;		
+			}
+			else{
+				let b = b + stepY;
+				let absB = Math.abs(b);
+				let adyMinusbdx = adyMinusbdx - absDx;		
+			}
+		}
+		return;
+	
+	}
+
+    /** Draws a filled rectangle where the top left corner
+     *  is (x1, y1) and the bottom right corner is (x2, y2). */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+		
+		var int biggerY,smallerY;
+		
+		if (x1 < 0 | x1 > 511){
+			do Sys.error(9);
+			return;
+		}
+		
+		if (x2 < 0 | x2 > 511){
+			do Sys.error(9);
+			return;
+		}
+		
+		if (y1 <0 | y1 > 255){
+			do Sys.error(9);
+			return;
+		}
+		
+		if (y2 <0 | y2 > 255){
+			do Sys.error(9);
+			return;
+		}
+		
+		if (x1=x2 & y1=y2){
+			do Screen.drawPixel(x1,y1);
+			return;
+		}
+		
+		if (y1 < y2){
+			let biggerY = y2+1;
+			let smallerY = y1;
+		}
+		else{
+			let biggerY = y1+1;
+			let smallerY = y2;	
+		}
+		
+		while (smallerY < biggerY){
+			do Screen.drawHorizontalLine(x1,x2,smallerY);
+			let smallerY = smallerY+1;
+		}
+		return;	
+    }
+
+    /** Draws a filled circle of radius r around (cx, cy). */
+    function void drawCircle(int cx, int cy, int r) {
+		
+		var int startY,endY,sqrtRes;
+		
+		if (cx < 0 | cx > 511){
+			do Sys.error(12);
+			return;
+		}
+		
+		if (cy < 0 | cy > 255){
+			do Sys.error(12);
+			return;
+		}
+		
+		if (r < 0 | r > 181){
+			do Sys.error(13);
+			return;
+		}
+		
+		if (r = 0){
+			do Screen.drawPixel(cx,cy);
+			return;
+		}
+		
+		let startY = -r;
+		let endY = r+1;
+		
+		while (startY < endY){
+			let sqrtRes = Math.sqrt((r*r)-(startY*startY));
+			do Screen.drawHorizontalLine(cx - sqrtRes,cx+sqrtRes,cy+startY);
+			let startY = startY +1;
+		}
+		return;
+    }
+}

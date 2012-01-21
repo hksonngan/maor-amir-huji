@@ -1,0 +1,238 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/12/Math.jack
+
+/**
+ * A basic math library.
+ */
+class Math {
+
+	static Array twoToThe;
+	
+
+    /** Initializes the library. */
+    function void init() {
+		
+		let twoToThe = Array.new(16);
+		do Math.initTwoToTheArray();
+		return;
+    }
+
+		
+	/** Initialize the array of power of 2 multiplications */
+	function void initTwoToTheArray(){
+		
+		var int index;
+		var int number;
+		let index = 1;
+		let number = 1;
+		let twoToThe[0] = 1;	
+		while (index < 16)
+		{
+			let number = number+number;
+			let twoToThe[index] = number;
+			let index = index + 1;
+		}
+		return;
+	}
+	
+	
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+		if (~(x<0))
+		{
+			return x;
+		}
+		else {
+			return -x;
+		}
+    }
+
+	
+    /** Returns the product of x and y. */
+    function int multiply(int x, int y) {
+		var int j,shiftedX,sum,endWhileFlag;
+		var int shorterNum,absX,absY;
+		var bool sign;
+				
+		if (x = 0){
+			return 0;
+		}
+		else {
+			if (y=0) {
+				return 0;
+			}
+		}
+	
+		//decide on the sign of the result
+		if (x<0){
+			if (y>0){
+				let sign = true;
+			}
+			else{
+				let sign = false;
+			}			
+		}
+		else{
+			if (y<0){
+				let sign = true;
+			}
+			else{
+				let sign = false;
+			}
+		}
+				
+				
+		//check who has more bits		
+		let absX = Math.abs(x);
+		let absY = Math.abs(y);		
+		
+		if (absX <  absY){
+			let shiftedX = absY;
+			let shorterNum = absX;
+		}
+		else{
+			let shiftedX = absX;
+			let shorterNum = absY;
+		}
+
+		//calculating the multiplication
+		let sum=0;
+		let j = 0;
+		let endWhileFlag = 0;
+		while (endWhileFlag < shorterNum)
+		{
+			if ((shorterNum & twoToThe[j]) > 0)
+			{
+				let sum = sum + shiftedX;
+				let endWhileFlag = endWhileFlag + twoToThe[j];
+			}
+			let shiftedX = shiftedX+shiftedX;
+			let j = j + 1;
+		}
+	
+		if (sign){
+			let sum = -sum;
+		}	
+		return sum;
+    }
+
+
+	/** Returns the integer part of x/y where both are positive */
+	function int calcDivide(int x,int y){
+		var int q;
+		var int temp;
+		
+		//case y was overflow	
+		if (y<0){
+			return 0;
+		}
+		else {
+			if (y>x){
+				return 0;
+		}
+		}
+		
+		let q = Math.calcDivide(x,y+y);
+		let temp = q*y;
+		if ((x - (temp+temp)) < y){
+			return q+q;
+		}
+		else{
+			return q+q+1;
+		}
+		
+	}
+	
+    /** Returns the integer part of x/y. */
+    function int divide(int x, int y) {	
+		var bool sign;
+		var int absX,absY,result;
+		
+		//case y is zero
+		if (y = 0){
+			do Sys.error(3);
+		}
+
+		if (x = 0){
+			return 0;
+		}
+		
+		let absX = Math.abs(x);
+		let absY = Math.abs(y);
+		
+		//decide on the sign of the result
+		if (x<0){
+			if (y>0){
+				let sign = false;
+			}
+			else{
+				let sign = true;
+			}			
+		}
+		else{
+			if (y<0){
+				let sign = false;
+			}
+			else{
+				let sign = true;
+			}
+		}
+		let result= Math.calcDivide(absX,absY);
+		if (sign = true){
+			return result;
+		}
+		else {
+			return -result;
+		}
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+		var int y,index,tempNum,tempNumPow2;
+		
+		//case of negative input
+		if (x < 0){
+			do Sys.error(4);
+		}
+		
+		if (x = 0){
+			return 0;
+		}
+		
+		let y=0;
+		let index = 7;
+		while (index > -1){
+			let tempNum = y+twoToThe[index];
+			let tempNumPow2 =Math.multiply(tempNum,tempNum);
+			if (((tempNumPow2 < x) | (tempNumPow2 = x)) & (tempNumPow2 >0)){
+				let y = tempNum;
+			}
+			let index = index - 1;
+		}
+		return y;
+    }
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+	if (a < b)
+		{
+			return b;
+		}
+	else {
+			return a;
+		 }
+    }
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+	if (a < b)
+		{
+			return a;
+		}
+	else {
+			return b;
+		}	
+    }
+}
