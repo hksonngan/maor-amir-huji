@@ -4,27 +4,27 @@ Amir Lazarovitch, ID 300331592, ichamir.lazarov@mail.huji.ac.il
 Maor Dayan, ID 300564770, maor.dayan@mail.huji.ac.il
 ===============================================================================
 
-                           Project 10: Compiler I (Syntax Analysis)
-                           ---------------------------------------- 
+                           Project 11: Compiler II (Code Generation)
+                           ------------------------------------------ 
   
 
 Submitted Files
 ---------------
 README
 Makefile
-JackAnalyzer - the script to run the compiled file
+JackCompiler - the script to run the compiled file
 CompilationEngine.java	- uses tokenizer to compile a class.
-JackTokenizer.java  - parses the jack file seperating symbols, identifiers...
-JackAnalyzer.java - check parameters open files. Runs compiler.	
+JackTokenizer.java  - parses the jack file separating symbols, identifiers...
+JackCompiler.java - check parameters open files. Runs compiler.	
 Keyword.java	- Keyword enum.   
 TokenType.java	- Token types enum.
+VMWriter.java- Writes VM commands to file.
+SymbolTable.java - stores variables (static, field, regular var) information.
+Kind - enum describing a variable to store in SymbolTable.
 
 
 
 Remarks
 -------
 * The program was written in java and was designed as it was
-  proposed in the project description.
-* I used a lot of assert commands for debugging and documenting
-* Because I did'nt know how you compile java files, I commented out
-  the asserts. This way we can still see the comments.
+  proposed in the project description based on project 10.
