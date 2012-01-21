@@ -70,7 +70,6 @@ public class JackCompiler {
 
 		CompilationEngine comp = new CompilationEngine(t, writer);
 		
-		System.out.println("Compiling file: " + current.getName());
 		comp.startCompile();
 
 		r.close();		
